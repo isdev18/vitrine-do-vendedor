@@ -25,7 +25,9 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'vitrine-vendedor-secret-2026
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///vitrine_vendedor.db')
 # Railway/Heroku usam postgres:// mas SQLAlchemy precisa de postgresql://
 if DATABASE_URL.startswith('postgres://'):
-    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
+elif DATABASE_URL.startswith('postgresql://') and '+' not in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgresql+psycopg://', 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JSON_AS_ASCII'] = False

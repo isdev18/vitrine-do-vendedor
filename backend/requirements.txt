@@ -1,6 +1,6 @@
 # ============================================
 # Vitrine do Vendedor - BACKEND (FLASK)
-# Produção
+# Produção - Compatível com Python 3.11+
 # ============================================
 
 # Framework
@@ -8,9 +8,9 @@ Flask==3.0.0
 Flask-CORS==4.0.0
 Flask-SQLAlchemy==3.1.1
 
-# Database
+# Database - psycopg3 para compatibilidade com Python 3.13
 SQLAlchemy==2.0.25
-psycopg2-binary==2.9.9
+psycopg[binary]==3.1.18
 
 # Authentication
 PyJWT==2.8.0
