@@ -12,13 +12,11 @@ const CONFIG = {
     APP_VERSION: '1.0.0',
     APP_URL: IS_PRODUCTION ? 'https://vitrine-do-vendedor.vercel.app' : window.location.origin,
     
-    // API Backend
-    API_URL: IS_PRODUCTION 
-        ? 'https://vitrine-do-vendedor-api.onrender.com'
-        : 'http://localhost:8000',
+    // API Backend - Agora no mesmo domínio (Vercel Serverless)
+    API_URL: window.location.origin + '/api',
     
     // Usar API real ou localStorage
-    USE_API: true, // Backend ativo no Render
+    USE_API: false, // Usando localStorage por enquanto (mais estável)
     
     // Planos e Preços
     PLANOS: {
