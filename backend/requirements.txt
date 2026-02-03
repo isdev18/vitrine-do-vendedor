@@ -10,7 +10,7 @@ Flask-SQLAlchemy==3.1.1
 
 # Database - psycopg3 para compatibilidade com Python 3.13
 SQLAlchemy==2.0.25
-psycopg[binary]==3.1.18
+psycopg[binary]==3.2.3
 
 # Authentication
 PyJWT==2.8.0
