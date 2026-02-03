@@ -10,15 +10,15 @@ const CONFIG = {
     // Informações do Sistema
     APP_NAME: 'Vitrine do Vendedor',
     APP_VERSION: '1.0.0',
-    APP_URL: IS_PRODUCTION ? 'https://vitrinevendedor.com' : window.location.origin,
+    APP_URL: IS_PRODUCTION ? 'https://vitrine-do-vendedor.vercel.app' : window.location.origin,
     
     // API Backend
     API_URL: IS_PRODUCTION 
-        ? 'https://seu-backend.railway.app'  // Altere para sua URL do Railway
+        ? 'https://vitrine-do-vendedor-api.onrender.com'
         : 'http://localhost:8000',
     
     // Usar API real ou localStorage
-    USE_API: false, // Mude para true quando o backend estiver no ar
+    USE_API: true, // Backend ativo no Render
     
     // Planos e Preços
     PLANOS: {
