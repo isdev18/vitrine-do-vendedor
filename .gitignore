@@ -1,0 +1,46 @@
+# ============================================
+# Vitrine do Vendedor - Git Ignore
+# ============================================
+
+# Ambiente Python
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+.env
+*.env.local
+.env.production
+
+# Database local
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Node (se usar)
+node_modules/
+
+# Uploads locais
+uploads/
+
+# Arquivos sensíveis
+*.pem
+*.key
+secrets/

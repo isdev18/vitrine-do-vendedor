@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Vitrine do Vendedor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           LOGIN PAGE - CSS INTERNO
+           ============================================ */
+        
+        /* Reset & Variáveis */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --color-primary: #e31837;
+            --color-primary-dark: #c41230;
+            --color-primary-light: rgba(227, 24, 55, 0.1);
+            --color-primary-gradient: linear-gradient(135deg, #e31837 0%, #c41230 100%);
+            --color-text-primary: #1a1a2e;
+            --color-text-secondary: #4a4a68;
+            --color-text-muted: #6b6b8a;
+            --color-text-inverse: #ffffff;
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #f8f9fa;
+            --color-border: #e8e8ed;
+            --color-success: #28a745;
+            --color-danger: #dc3545;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --shadow-primary: 0 4px 14px rgba(227, 24, 55, 0.3);
+            --transition-base: 0.3s ease;
+            --header-height: 72px;
+        }
+        
+        /* Tema Escuro */
+        [data-theme="dark"] {
+            --color-text-primary: #f0f0f5;
+            --color-text-secondary: #b8b8c8;
+            --color-text-muted: #8888a0;
+            --color-bg-primary: #1a1a2e;
+            --color-bg-secondary: #16162a;
+            --color-border: #3a3a55;
+            --color-primary-light: rgba(227, 24, 55, 0.2);
+        }
+        
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #16162a 0%, #1a1a2e 100%);
+        }
+        
+        [data-theme="dark"] .header {
+            background: rgba(26, 26, 46, 0.95);
+            border-bottom-color: var(--color-border);
+        }
+        
+        [data-theme="dark"] .logo-text {
+            color: var(--color-text-primary);
+        }
+        
+        [data-theme="dark"] .auth-card {
+            background: #252540;
+            border-color: var(--color-border);
+        }
+        
+        [data-theme="dark"] input {
+            background: #1a1a2e;
+            border-color: var(--color-border);
+            color: var(--color-text-primary);
+        }
+        
+        [data-theme="dark"] input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        [data-theme="dark"] .btn-outline {
+            border-color: var(--color-border);
+            color: var(--color-text-primary);
+        }
+        
+        [data-theme="dark"] .btn-outline:hover {
+            background: var(--color-bg-secondary);
+        }
+        
+        /* Toggle de tema */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+        
+        [data-theme="dark"] .theme-toggle { background: #252540; }
+        [data-theme="dark"] .theme-toggle .icon-sun { display: inline; }
+        [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+        [data-theme="light"] .theme-toggle .icon-sun,
+        :root:not([data-theme]) .theme-toggle .icon-sun { display: none; }
+        [data-theme="light"] .theme-toggle .icon-moon,
+        :root:not([data-theme]) .theme-toggle .icon-moon { display: inline; }
+        
+        /* Base */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%);
+            min-height: 100vh;
+        }
+        
+        a { color: var(--color-primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+        
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .logo-icon { font-size: 1.5rem; }
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        /* Auth Section */
+        .auth-section {
+            min-height: 100vh;
+            padding: calc(var(--header-height) + 40px) 0 40px;
+        }
+        
+        .auth-container-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            padding: 48px;
+            background: var(--color-bg-primary);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        .auth-header h1 {
+            margin-bottom: 8px;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .auth-header p {
+            font-size: 1rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* Form */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--color-text-primary);
+        }
+        
+        .form-group input {
+            padding: 14px 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--color-text-primary);
+            background: var(--color-bg-primary);
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-light);
+        }
+        
+        .password-input {
+            position: relative;
+        }
+        
+        .password-input input {
+            width: 100%;
+            padding-right: 50px;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .toggle-password:hover { opacity: 1; }
+        
+        /* Form Row */
+        .form-row {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--color-primary);
+        }
+        
+        .forgot-password {
+            font-size: 0.875rem;
+            color: var(--color-primary);
+        }
+        
+        /* Alert */
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .alert-error {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--color-danger);
+        }
+        
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--color-success);
+        }
+        
+        /* Botões */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1;
+            text-decoration: none;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .btn-primary {
+            background: var(--color-primary-gradient);
+            color: var(--color-text-inverse);
+            box-shadow: var(--shadow-primary);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(227, 24, 55, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border-color: var(--color-border);
+            color: var(--color-text-primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--color-bg-secondary);
+            border-color: #d0d0d5;
+        }
+        
+        .btn-full { width: 100%; }
+        
+        .btn-loading { display: none; }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Auth Divider */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--color-border);
+        }
+        
+        /* Auth Demo */
+        .auth-demo {
+            text-align: center;
+        }
+        
+        .auth-demo p {
+            margin-bottom: 12px;
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* Auth Footer */
+        .auth-footer {
+            padding-top: 24px;
+            margin-top: 24px;
+            text-align: center;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .auth-footer p {
+            color: var(--color-text-muted);
+        }
+        
+        .auth-footer a {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        
+        /* Footer Simples */
+        .footer-simple {
+            padding: 24px 0;
+            text-align: center;
+        }
+        
+        .footer-simple p {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 11000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            color: var(--color-text-inverse);
+            background: #1a1a2e;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all var(--transition-base);
+        }
+        
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success { background: var(--color-success); }
+        .toast.error { background: var(--color-danger); }
+        
+        /* Loader */
+        .global-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 12000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .global-loader.active { display: flex; }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 16px;
+            border: 4px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 480px) {
+            .container { padding: 0 16px; }
+            .auth-card { padding: 32px 24px; }
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <!-- Header Simples -->
+    <header class="header header-simple">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🏍️</span>
+                <span class="logo-text">Vitrine do Vendedor</span>
+            </a>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
+                <span class="icon-moon">🌙</span>
+                <span class="icon-sun">☀️</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Login Section -->
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-container auth-container-center">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1>Bem-vindo de volta!</h1>
+                        <p>Acesse sua conta para gerenciar sua vitrine</p>
+                    </div>
+
+                    <!-- Mensagem de sucesso do cadastro -->
+                    <div id="successMessage" class="alert alert-success" style="display: none;">
+                        <span class="alert-icon">✓</span>
+                        <span>Conta criada com sucesso! Faça login para continuar.</span>
+                    </div>
+
+                    <form id="loginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="senha">Senha</label>
+                            <div class="password-input">
+                                <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+                                <button type="button" class="toggle-password" onclick="togglePassword('senha')">
+                                    <span class="eye-icon">👁️</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group form-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="lembrar">
+                                <span class="checkmark"></span>
+                                <span>Lembrar de mim</span>
+                            </label>
+                            <a href="recuperar-senha.html" class="forgot-password">Esqueceu a senha?</a>
+                        </div>
+
+                        <div id="loginError" class="alert alert-error" style="display: none;">
+                            <span class="alert-icon">✕</span>
+                            <span class="alert-text">E-mail ou senha incorretos.</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full" id="submitBtn">
+                            <span class="btn-text">Entrar</span>
+                            <span class="btn-loading" style="display: none;">
+                                <span class="spinner"></span> Entrando...
+                            </span>
+                        </button>
+                    </form>
+
+                    <div class="auth-divider">
+                        <span>ou</span>
+                    </div>
+
+                    <div class="auth-demo">
+                        <p>Quer testar o sistema?</p>
+                        <button class="btn btn-outline btn-full" onclick="loginDemo()">
+                            Acessar conta demonstração
+                        </button>
+                    </div>
+
+                    <div class="auth-footer">
+                        <p>Ainda não tem conta? <a href="cadastro.html">Criar conta grátis</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Simples -->
+    <footer class="footer-simple">
+        <div class="container">
+            <p>© 2026 Vitrine do Vendedor. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/payment.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Verificar se usuário já está logado
+        if (auth.isAuthenticated()) {
+            const user = auth.getFullCurrentUser();
+            window.location.href = user.role === 'admin' ? 'admin.html' : 'painel.html';
+        }
+        
+        // Verificar mensagem de sucesso do cadastro
+        if (sessionStorage.getItem('cadastroSucesso')) {
+            document.getElementById('successMessage').style.display = 'flex';
+            sessionStorage.removeItem('cadastroSucesso');
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const lembrar = document.getElementById('lembrar').checked;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoading = submitBtn.querySelector('.btn-loading');
+            const loginError = document.getElementById('loginError');
+            
+            // Esconder erro anterior
+            loginError.style.display = 'none';
+            
+            // Mostrar loading
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-flex';
+            submitBtn.disabled = true;
+            
+            try {
+                const result = await auth.login(email, senha, lembrar);
+                
+                const user = auth.getFullCurrentUser();
+                
+                // Verificar se é admin
+                if (user.role === 'admin') {
+                    window.location.href = 'admin.html';
+                    return;
+                }
+                
+                // Verificar se tem pagamento aprovado pendente
+                const pagamentoAprovado = sessionStorage.getItem('pagamentoAprovado');
+                if (pagamentoAprovado) {
+                    const dados = JSON.parse(pagamentoAprovado);
+                    sessionStorage.removeItem('pagamentoAprovado');
+                    
+                    // Criar assinatura com os dados do pagamento
+                    await payment.createSubscription(user.id, dados.plano, {
+                        method: dados.metodo
+                    });
+                    
+                    alert('🎉 Assinatura ativada com sucesso! Você tem 7 dias grátis para testar.');
+                    window.location.href = 'painel.html';
+                    return;
+                }
+                
+                // Verificar se tem assinatura ativa
+                const subscription = db.getSubscriptionByUserId(user.id);
+                
+                if (!subscription) {
+                    // Não tem assinatura, ir para planos
+                    window.location.href = 'planos.html';
+                } else {
+                    // Tem assinatura, ir para painel
+                    window.location.href = 'painel.html';
+                }
+                
+            } catch (error) {
+                loginError.querySelector('.alert-text').textContent = error.message;
+                loginError.style.display = 'flex';
+            } finally {
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        
+        async function loginDemo() {
+            // Criar usuário demo se não existir
+            let demoUser = db.getUserByEmail('demo@vitrinevendedor.com');
+            
+            if (!demoUser) {
+                try {
+                    await auth.register('demo@vitrinevendedor.com', 'demo123', 'demo123');
+                    demoUser = db.getUserByEmail('demo@vitrinevendedor.com');
+                    
+                    // Criar assinatura trial
+                    db.createSubscription(demoUser.id, 'profissional');
+                    
+                    // Configurar vitrine de exemplo
+                    db.updateVitrine(demoUser.id, {
+                        nome: 'João Vendedor',
+                        slogan: 'As melhores motos Honda com as melhores condições!',
+                        url_personalizada: 'joao-vendedor',
+                        whatsapp: '11999999999',
+                        instagram: 'joaovendedor_honda',
+                        publicada: true
+                    });
+                    
+                    // Adicionar motos de exemplo
+                    db.createProduto(demoUser.id, {
+                        nome: 'CG 160 Titan',
+                        descricao: 'A moto mais vendida do Brasil. Economia e durabilidade.',
+                        preco: 'R$ 15.990,00',
+                        ano: '2025/2026',
+                        categoria: 'street',
+                        destaque: true
+                    });
+                    
+                    db.createProduto(demoUser.id, {
+                        nome: 'Bros 160',
+                        descricao: 'Versatilidade para cidade e estrada. Ideal para aventuras.',
+                        preco: 'R$ 19.490,00',
+                        ano: '2025/2026',
+                        categoria: 'trail'
+                    });
+                    
+                    db.createProduto(demoUser.id, {
+                        nome: 'PCX 160',
+                        descricao: 'Scooter premium com conforto e tecnologia.',
+                        preco: 'R$ 17.990,00',
+                        ano: '2025/2026',
+                        categoria: 'scooter'
+                    });
+                } catch (error) {
+                    console.log('Usuário demo já existe');
+                }
+            }
+            
+            // Fazer login
+            try {
+                await auth.login('demo@vitrinevendedor.com', 'demo123', false);
+                window.location.href = 'painel.html';
+            } catch (error) {
+                console.error('Erro no login demo:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Vitrine do Vendedor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="theme-color" id="themeColor" content="#e31837">
+    <style>
+        /* ============================================
+           VITRINE PAGE - CSS INTERNO
+           ============================================ */
+        
+        /* Reset & Variáveis */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --color-primary: #e31837;
+            --color-primary-dark: #c41230;
+            --color-primary-gradient: linear-gradient(135deg, #e31837 0%, #c41230 100%);
+            --color-text-primary: #1a1a2e;
+            --color-text-secondary: #4a4a68;
+            --color-text-muted: #6b6b8a;
+            --color-text-inverse: #ffffff;
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #f8f9fa;
+            --color-border: #e8e8ed;
+            --color-whatsapp: #25d366;
+            --color-whatsapp-dark: #128c7e;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.1);
+            --transition-base: 0.3s ease;
+            --transition-fast: 0.2s ease;
+        }
+        
+        /* Tema Escuro */
+        [data-theme="dark"] {
+            --color-text-primary: #f0f0f5;
+            --color-text-secondary: #b8b8c8;
+            --color-text-muted: #8888a0;
+            --color-bg-primary: #1a1a2e;
+            --color-bg-secondary: #16162a;
+            --color-border: #3a3a55;
+            --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+        
+        [data-theme="dark"] .produto-card {
+            background: #252540;
+            border-color: var(--color-border);
+        }
+        
+        [data-theme="dark"] .produto-info h3,
+        [data-theme="dark"] .produto-preco {
+            color: var(--color-text-primary);
+        }
+        
+        [data-theme="dark"] .modal-content {
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+        }
+        
+        [data-theme="dark"] .vitrine-about,
+        [data-theme="dark"] .vitrine-contato {
+            background: #252540;
+        }
+        
+        [data-theme="dark"] .filter-btn {
+            background: #252540;
+            color: var(--color-text-secondary);
+            border-color: var(--color-border);
+        }
+        
+        [data-theme="dark"] .filter-btn:hover,
+        [data-theme="dark"] .filter-btn.active {
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        /* Toggle de tema na vitrine */
+        .theme-toggle-float {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-md);
+            z-index: 100;
+            transition: all var(--transition-fast);
+        }
+        
+        .theme-toggle-float:hover {
+            transform: scale(1.1);
+        }
+        
+        [data-theme="dark"] .theme-toggle-float .icon-sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-float .icon-moon { display: none; }
+        [data-theme="light"] .theme-toggle-float .icon-sun,
+        :root:not([data-theme]) .theme-toggle-float .icon-sun { display: none; }
+        [data-theme="light"] .theme-toggle-float .icon-moon,
+        :root:not([data-theme]) .theme-toggle-float .icon-moon { display: inline; }
+        
+        /* Base */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background: var(--color-bg-secondary);
+            min-height: 100vh;
+        }
+        
+        a { color: var(--color-primary); text-decoration: none; }
+        
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: var(--color-primary-gradient);
+            transition: opacity 0.5s ease;
+        }
+        
+        .splash-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .splash-content {
+            text-align: center;
+            color: var(--color-text-inverse);
+        }
+        
+        .splash-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .splash-icon {
+            font-size: 4rem;
+        }
+        
+        .splash-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .splash-loader {
+            margin-top: 32px;
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loader-bar {
+            width: 0;
+            height: 100%;
+            background: var(--color-text-inverse);
+            animation: load 1.5s ease forwards;
+        }
+        
+        @keyframes load {
+            to { width: 100%; }
+        }
+        
+        /* Vitrine Container */
+        .vitrine-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Vitrine Header */
+        .vitrine-header {
+            position: relative;
+        }
+        
+        .vitrine-banner {
+            position: relative;
+            min-height: 280px;
+            display: flex;
+            align-items: flex-end;
+            padding: 32px 24px;
+            background: var(--color-primary-gradient);
+            overflow: hidden;
+        }
+        
+        .banner-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+        }
+        
+        .banner-content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            text-align: center;
+            color: var(--color-text-inverse);
+        }
+        
+        .vendedor-foto {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .vendedor-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .foto-placeholder {
+            font-weight: 700;
+            font-size: 2rem;
+        }
+        
+        .vendedor-nome {
+            margin-bottom: 8px;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .vendedor-slogan {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        /* Descrição */
+        .vitrine-descricao {
+            padding: 20px 24px;
+            text-align: center;
+            background: var(--color-bg-primary);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .vitrine-descricao p {
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+        }
+        
+        /* Contato Rápido */
+        .vitrine-contato-rapido {
+            display: flex;
+            gap: 12px;
+            padding: 20px 24px;
+            background: var(--color-bg-primary);
+        }
+        
+        .contato-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 16px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--color-text-inverse);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all var(--transition-fast);
+        }
+        
+        .whatsapp-btn {
+            background: var(--color-whatsapp);
+        }
+        
+        .whatsapp-btn:hover {
+            background: var(--color-whatsapp-dark);
+        }
+        
+        .instagram-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+        
+        .btn-icon {
+            font-size: 1.125rem;
+        }
+        
+        /* Filtros */
+        .vitrine-filtros {
+            padding: 16px 24px;
+            background: var(--color-bg-primary);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .filtros-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        
+        .filtro-btn {
+            padding: 8px 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            background: var(--color-bg-primary);
+            border: 2px solid var(--color-border);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .filtro-btn:hover,
+        .filtro-btn.active {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        
+        /* Catálogo */
+        .vitrine-catalogo {
+            padding: 24px;
+        }
+        
+        .catalogo-titulo {
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .catalogo-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .catalogo-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--color-text-muted);
+        }
+        
+        .catalogo-empty span {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 3rem;
+        }
+        
+        /* Produto Card */
+        .produto-card {
+            overflow: hidden;
+            background: var(--color-bg-primary);
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        
+        .produto-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .produto-imagem {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 220px;
+            font-size: 4rem;
+            color: #ddd;
+            background: #ffffff;
+            cursor: pointer;
+            overflow: hidden;
+            border-bottom: 1px solid var(--color-border);
+            padding: 10px;
+        }
+        
+        .produto-imagem img {
+            max-width: 100%;
+            max-height: 200px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+        
+        .produto-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-text-inverse);
+            background: var(--color-primary);
+            border-radius: 100px;
+        }
+        
+        .produto-badge.vendido {
+            background: var(--color-text-muted);
+        }
+        
+        .produto-info {
+            padding: 20px;
+        }
+        
+        .produto-info h3 {
+            margin-bottom: 8px;
+            font-size: 1.125rem;
+        }
+        
+        .produto-specs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        .produto-preco {
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+        
+        .produto-card .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-text-inverse);
+            background: var(--color-whatsapp);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        
+        .produto-card .btn:hover {
+            background: var(--color-whatsapp-dark);
+        }
+        
+        /* Info Contato */
+        .vitrine-info-contato {
+            padding: 24px;
+            background: var(--color-bg-primary);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .vitrine-info-contato h3 {
+            margin-bottom: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .info-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .info-item a {
+            color: var(--color-primary);
+        }
+        
+        /* Footer */
+        .vitrine-footer {
+            padding: 24px;
+            text-align: center;
+            background: var(--color-bg-secondary);
+        }
+        
+        .vitrine-footer p {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        .vitrine-footer a {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+        
+        /* WhatsApp Flutuante */
+        .whatsapp-float {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            font-size: 1.75rem;
+            color: var(--color-text-inverse);
+            background: var(--color-whatsapp);
+            border-radius: 50%;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Not Found */
+        .vitrine-not-found {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--color-bg-secondary);
+        }
+        
+        .not-found-content {
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+            background: var(--color-bg-primary);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .not-found-icon {
+            margin-bottom: 20px;
+            font-size: 4rem;
+        }
+        
+        .not-found-content h1 {
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+        }
+        
+        .not-found-content p {
+            margin-bottom: 24px;
+            color: var(--color-text-muted);
+        }
+        
+        .not-found-content .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-text-inverse);
+            background: var(--color-primary-gradient);
+            border-radius: 12px;
+            text-decoration: none;
+        }
+        
+        /* Image Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+        }
+        
+        .image-modal.active { display: flex; }
+        
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: var(--color-text-inverse);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .image-modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            font-size: 2rem;
+            color: var(--color-text-inverse);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        
+        .image-modal-nav:hover { background: rgba(255, 255, 255, 0.3); }
+        .image-modal-nav.prev { left: 20px; }
+        .image-modal-nav.next { right: 20px; }
+        
+        /* Responsividade */
+        @media (min-width: 600px) {
+            .catalogo-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .vitrine-banner { min-height: 240px; }
+            .vendedor-foto { width: 80px; height: 80px; }
+            .vendedor-nome { font-size: 1.5rem; }
+            .vitrine-contato-rapido { flex-direction: column; }
+        }
+    </style>
+</head>
+</head>
+<body class="vitrine-page">
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <span class="splash-icon">🏍️</span>
+                <span class="splash-text">Vitrine do Vendedor</span>
+            </div>
+            <div class="splash-loader">
+                <div class="loader-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo da Vitrine -->
+    <div id="vitrineContent" class="vitrine-container" style="display: none;">
+        <!-- Header da Vitrine -->
+        <header class="vitrine-header">
+            <div class="vitrine-banner" id="vitrineBanner">
+                <div class="banner-overlay"></div>
+                <div class="banner-content">
+                    <div class="vendedor-foto" id="vendedorFoto">
+                        <span class="foto-placeholder">VH</span>
+                    </div>
+                    <h1 class="vendedor-nome" id="vendedorNome">Nome do Vendedor</h1>
+                    <p class="vendedor-slogan" id="vendedorSlogan">Slogan ou frase de impacto</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Descrição -->
+        <section class="vitrine-descricao" id="vitrineDescricao" style="display: none;">
+            <p id="vendedorDescricao"></p>
+        </section>
+
+        <!-- Botões de Contato Rápido -->
+        <section class="vitrine-contato-rapido">
+            <a href="#" id="btnWhatsapp" class="contato-btn whatsapp-btn">
+                <span class="btn-icon">💬</span>
+                <span>Falar no WhatsApp</span>
+            </a>
+            <a href="#" id="btnInstagram" class="contato-btn instagram-btn" style="display: none;">
+                <span class="btn-icon">📸</span>
+                <span>Instagram</span>
+            </a>
+        </section>
+
+        <!-- Filtros de Categoria -->
+        <section class="vitrine-filtros" id="vitrineFiltros">
+            <div class="filtros-scroll">
+                <button class="filtro-btn active" data-categoria="todas">Todas</button>
+            </div>
+        </section>
+
+        <!-- Catálogo de Motos -->
+        <section class="vitrine-catalogo">
+            <h2 class="catalogo-titulo">🏍️ Motos Disponíveis</h2>
+            <div class="catalogo-grid" id="catalogoGrid">
+                <!-- Motos serão inseridas via JavaScript -->
+            </div>
+            <div class="catalogo-empty" id="catalogoEmpty" style="display: none;">
+                <span>🏍️</span>
+                <p>Nenhuma moto disponível no momento</p>
+            </div>
+        </section>
+
+        <!-- Informações de Contato -->
+        <section class="vitrine-info-contato" id="vitrineInfoContato">
+            <h3>📍 Informações de Contato</h3>
+            <div class="info-lista" id="infoLista">
+                <!-- Preenchido via JS -->
+            </div>
+        </section>
+
+        <!-- Footer da Vitrine -->
+        <footer class="vitrine-footer">
+            <p>Feito com ❤️ usando <a href="index.html">Vitrine do Vendedor</a></p>
+        </footer>
+
+        <!-- Botão WhatsApp Flutuante -->
+        <a href="#" id="whatsappFloat" class="whatsapp-float">
+            <span>💬</span>
+        </a>
+    </div>
+
+    <!-- Vitrine não encontrada -->
+    <div id="vitrineNotFound" class="vitrine-not-found" style="display: none;">
+        <div class="not-found-content">
+            <span class="not-found-icon">🔍</span>
+            <h1>Vitrine não encontrada</h1>
+            <p>A vitrine que você procura não existe ou foi desativada.</p>
+            <a href="index.html" class="btn btn-primary">Criar minha vitrine</a>
+        </div>
+    </div>
+
+    <!-- Modal de Imagem -->
+    <div id="imageModal" class="image-modal">
+        <div class="image-modal-overlay" onclick="closeImageModal()"></div>
+        <div class="image-modal-content">
+            <button class="modal-close-img" onclick="closeImageModal()">✕</button>
+            <button class="modal-prev" onclick="prevImage()">❮</button>
+            <img id="modalImage" src="" alt="Imagem da moto">
+            <button class="modal-next" onclick="nextImage()">❯</button>
+            <div class="image-counter">
+                <span id="imageCounter">1/3</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes da Moto -->
+    <div id="motoDetalheModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2 id="detalheNome">Nome da Moto</h2>
+                <button class="modal-close" onclick="closeMotoDetalhe()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="detalhe-galeria" id="detalheGaleria">
+                    <!-- Imagens -->
+                </div>
+                <div class="detalhe-info">
+                    <div class="detalhe-preco" id="detalhePreco">R$ 0,00</div>
+                    <div class="detalhe-meta">
+                        <span id="detalheAno"></span>
+                        <span id="detalheCategoria"></span>
+                    </div>
+                    <div class="detalhe-descricao" id="detalheDescricao"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="detalheWhatsapp" class="btn btn-whatsapp btn-full btn-large">
+                    💬 Tenho interesse nesta moto
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante de Tema -->
+    <button class="theme-toggle-float" onclick="toggleTheme()" title="Alternar tema">
+        <span class="icon-moon">🌙</span>
+        <span class="icon-sun">☀️</span>
+    </button>
+
+    <script src="js/config.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let vitrineData = null;
+        let produtosData = [];
+        let currentImageIndex = 0;
+        let currentImages = [];
+        let categoriaAtiva = 'todas';
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pegar parâmetro da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const vitrineUrl = urlParams.get('v');
+            const minhaVitrine = urlParams.get('minha');
+            const userId = urlParams.get('userId');
+
+            if (vitrineUrl) {
+                // Carregar vitrine pelo URL público
+                loadVitrine(vitrineUrl);
+            } else if (userId) {
+                // Carregar vitrine pelo userId (vindo do painel)
+                loadVitrineByUserId(userId);
+            } else if (minhaVitrine !== null) {
+                // Parâmetro ?minha - forçar carregar vitrine do usuário logado
+                loadUserVitrine(true);
+            } else {
+                // Sem parâmetro - verificar se usuário está logado
+                loadUserVitrine(false);
+            }
+        });
+
+        function loadUserVitrine(forceLogin = false) {
+            // Debug logs
+            console.log('=== DEBUG VITRINE ===');
+            console.log('forceLogin:', forceLogin);
+            console.log('auth existe:', typeof auth !== 'undefined');
+            console.log('localStorage vh_session:', localStorage.getItem('vh_session'));
+            console.log('sessionStorage vh_session:', sessionStorage.getItem('vh_session'));
+            
+            // Verificar se usuário está logado
+            let currentUser = null;
+            
+            try {
+                if (typeof auth !== 'undefined') {
+                    console.log('auth.isAuthenticated():', auth.isAuthenticated());
+                    currentUser = auth.getCurrentUser();
+                    console.log('currentUser:', currentUser);
+                }
+            } catch (e) {
+                console.error('Erro ao verificar usuário:', e);
+            }
+            
+            if (currentUser) {
+                // Usuário logado - carregar a vitrine dele
+                vitrineData = db.getVitrineByUserId(currentUser.id);
+                
+                if (vitrineData) {
+                    // Carregar produtos do usuário
+                    produtosData = db.getProdutosByVitrineId(vitrineData.id);
+                    renderVitrine();
+                    
+                    // Mostrar banners apropriados
+                    if (!vitrineData.nome || !vitrineData.url_personalizada) {
+                        // Vitrine incompleta - precisa configurar
+                        showSetupBanner();
+                    } else if (!vitrineData.publicada) {
+                        // Vitrine completa mas não publicada
+                        showUnpublishedBanner();
+                    }
+                } else {
+                    // Usuário logado mas sem vitrine - redirecionar para painel
+                    window.location.href = 'painel.html';
+                }
+            } else {
+                // Não está logado
+                if (forceLogin) {
+                    // Foi solicitado via ?minha - redirecionar para login
+                    window.location.href = 'login.html';
+                } else {
+                    // Mostrar página de demonstração
+                    showDemoOrRedirect();
+                }
+            }
+        }
+
+        function loadVitrineByUserId(userId) {
+            // Carregar vitrine diretamente pelo ID do usuário (vindo do painel)
+            console.log('=== DEBUG VITRINE BY USER ID ===');
+            console.log('userId:', userId);
+            
+            if (!userId) {
+                showDemoOrRedirect();
+                return;
+            }
+            
+            // Buscar vitrine pelo userId
+            vitrineData = db.getVitrineByUserId(userId);
+            console.log('vitrineData:', vitrineData);
+            
+            if (vitrineData) {
+                // Carregar produtos do usuário
+                produtosData = db.getProdutosByVitrineId(vitrineData.id);
+                renderVitrine();
+                
+                // Mostrar banners apropriados
+                if (!vitrineData.nome || !vitrineData.url_personalizada) {
+                    // Vitrine incompleta - precisa configurar
+                    showSetupBanner();
+                } else if (!vitrineData.publicada) {
+                    // Vitrine completa mas não publicada
+                    showUnpublishedBanner();
+                }
+            } else {
+                // Vitrine não encontrada
+                showNotFoundMessage();
+            }
+        }
+
+        function showNotFoundMessage() {
+            document.body.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; text-align: center; padding: 20px;">
+                    <h1 style="font-size: 48px; margin-bottom: 16px;">🔍</h1>
+                    <h2 style="color: #1a1a2e; margin-bottom: 8px;">Vitrine não encontrada</h2>
+                    <p style="color: #6b6b8a; margin-bottom: 24px;">A vitrine que você procura não existe ou foi removida.</p>
+                    <a href="index.html" style="background: #e31837; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Voltar ao início</a>
+                </div>
+            `;
+        }
+        
+        function showDemoOrRedirect() {
+            // Mostrar uma vitrine de demonstração para visitantes
+            vitrineData = {
+                nome: 'Vitrine do Vendedor - Demonstração',
+                slogan: 'Sua vitrine profissional para vender mais motos!',
+                descricao: 'Esta é uma demonstração de como sua vitrine pode ficar. Crie sua conta gratuita e comece a vender!',
+                foto_perfil: '',
+                banner: '',
+                cor_tema: '#e31837',
+                whatsapp: '',
+                instagram: '',
+                endereco: ''
+            };
+            
+            produtosData = [
+                {
+                    id: 'demo1',
+                    nome: 'CG 160 Titan',
+                    descricao: 'A moto mais vendida do Brasil. Economia e durabilidade.',
+                    preco: 'R$ 15.990,00',
+                    ano: '2025/2026',
+                    categoria: 'street',
+                    imagens: [],
+                    destaque: true
+                },
+                {
+                    id: 'demo2',
+                    nome: 'Bros 160',
+                    descricao: 'Versatilidade para cidade e trilha.',
+                    preco: 'R$ 19.490,00',
+                    ano: '2025/2026',
+                    categoria: 'trail',
+                    imagens: [],
+                    destaque: false
+                }
+            ];
+            
+            renderVitrine();
+            
+            // Mostrar banner de cadastro
+            setTimeout(() => {
+                const container = document.querySelector('.vitrine-container');
+                if (container) {
+                    const demoBanner = document.createElement('div');
+                    demoBanner.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #e31837, #c41230); color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 20px;">
+                            <h3 style="margin: 0 0 10px 0;">🏍️ Gostou? Crie sua vitrine grátis!</h3>
+                            <p style="margin: 0 0 15px 0; opacity: 0.9;">Cadastre-se agora e tenha 7 dias grátis para testar</p>
+                            <a href="cadastro.html" style="background: white; color: #e31837; padding: 10px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin-right: 10px;">Criar Conta Grátis</a>
+                            <a href="login.html" style="background: transparent; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; border: 2px solid white;">Já tenho conta</a>
+                        </div>
+                    `;
+                    container.insertBefore(demoBanner, container.firstChild);
+                }
+            }, 100);
+        }
+
+        function showSetupBanner() {
+            setTimeout(() => {
+                const container = document.querySelector('.vitrine-container');
+                if (container) {
+                    const setupBanner = document.createElement('div');
+                    setupBanner.className = 'setup-banner';
+                    setupBanner.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #e31837, #c41230); color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 20px;">
+                            <h3 style="margin: 0 0 10px 0;">⚙️ Configure sua vitrine</h3>
+                            <p style="margin: 0 0 15px 0; opacity: 0.9;">Complete seu perfil para publicar sua vitrine!</p>
+                            <a href="painel.html" style="background: white; color: #e31837; padding: 10px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">Ir para o Painel</a>
+                        </div>
+                    `;
+                    container.insertBefore(setupBanner, container.firstChild);
+                }
+            }, 100);
+        }
+        
+        function showUnpublishedBanner() {
+            setTimeout(() => {
+                const container = document.querySelector('.vitrine-container');
+                if (container) {
+                    const banner = document.createElement('div');
+                    banner.className = 'unpublished-banner';
+                    banner.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #ff9800, #f57c00); color: white; padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 20px;">
+                            <h3 style="margin: 0 0 10px 0;">🔒 Vitrine não publicada</h3>
+                            <p style="margin: 0 0 15px 0; opacity: 0.9;">Sua vitrine ainda não está visível para o público. Publique-a para que clientes possam encontrá-la!</p>
+                            <a href="painel.html" style="background: white; color: #f57c00; padding: 10px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">🚀 Publicar Vitrine</a>
+                        </div>
+                    `;
+                    container.insertBefore(banner, container.firstChild);
+                }
+            }, 100);
+        }
+
+        function loadVitrine(url) {
+            // Primeiro tentar buscar vitrine pública pelo URL
+            vitrineData = db.getVitrineByUrl(url);
+            
+            // Se não encontrou, verificar se é o próprio usuário tentando ver sua vitrine
+            if (!vitrineData) {
+                const currentUser = auth.getCurrentUser();
+                if (currentUser) {
+                    // Buscar vitrine do usuário logado
+                    const userVitrine = db.getVitrineByUserId(currentUser.id);
+                    // Se a URL da vitrine do usuário é a mesma que está tentando acessar
+                    if (userVitrine && userVitrine.url_personalizada === url) {
+                        vitrineData = userVitrine;
+                        // Mostrar banner de prévia (não publicada)
+                        showPreviewBanner();
+                    }
+                }
+            }
+
+            if (!vitrineData) {
+                showNotFound();
+                return;
+            }
+
+            // Incrementar visualizações (só se não for o próprio usuário)
+            const currentUser = auth.getCurrentUser();
+            if (!currentUser || vitrineData.user_id !== currentUser.id) {
+                db.incrementVitrineViews(vitrineData.id);
+            }
+
+            // Carregar produtos
+            produtosData = db.getProdutosByVitrineId(vitrineData.id);
+
+            // Renderizar
+            renderVitrine();
+        }
+        
+        function showPreviewBanner() {
+            setTimeout(() => {
+                const container = document.querySelector('.vitrine-container');
+                if (container) {
+                    const previewBanner = document.createElement('div');
+                    previewBanner.className = 'preview-banner';
+                    previewBanner.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 15px 20px; text-align: center; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                            <span style="font-size: 1.5rem;">👁️</span>
+                            <span><strong>Modo prévia:</strong> Só você pode ver esta vitrine. Publique para que clientes possam acessar!</span>
+                            <a href="painel.html" style="background: white; color: #007bff; padding: 8px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">Publicar Vitrine</a>
+                        </div>
+                    `;
+                    container.insertBefore(previewBanner, container.firstChild);
+                }
+            }, 100);
+        }
+
+        // ==========================================
+        // RENDERIZAÇÃO
+        // ==========================================
+
+        function renderVitrine() {
+            // Aplicar cor do tema
+            if (vitrineData.cor_tema) {
+                document.documentElement.style.setProperty('--vitrine-color', vitrineData.cor_tema);
+                document.getElementById('themeColor').content = vitrineData.cor_tema;
+            }
+
+            // Título da página
+            document.getElementById('pageTitle').textContent = `${vitrineData.nome} | Vitrine do Vendedor`;
+
+            // Header
+            document.getElementById('vendedorNome').textContent = vitrineData.nome || 'Vendedor Honda';
+            document.getElementById('vendedorSlogan').textContent = vitrineData.slogan || '';
+            document.getElementById('vendedorSlogan').style.display = vitrineData.slogan ? 'block' : 'none';
+
+            // Foto de perfil
+            if (vitrineData.foto_perfil) {
+                document.getElementById('vendedorFoto').innerHTML = `<img src="${vitrineData.foto_perfil}" alt="${vitrineData.nome}">`;
+            } else {
+                const iniciais = (vitrineData.nome || 'VH').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                document.getElementById('vendedorFoto').innerHTML = `<span class="foto-placeholder">${iniciais}</span>`;
+            }
+
+            // Banner
+            if (vitrineData.banner) {
+                document.getElementById('vitrineBanner').style.backgroundImage = `url(${vitrineData.banner})`;
+            }
+
+            // Descrição
+            if (vitrineData.descricao) {
+                document.getElementById('vendedorDescricao').textContent = vitrineData.descricao;
+                document.getElementById('vitrineDescricao').style.display = 'block';
+            }
+
+            // Botões de contato
+            if (vitrineData.whatsapp) {
+                const whatsappUrl = `https://wa.me/55${vitrineData.whatsapp}?text=${encodeURIComponent('Olá! Vi sua vitrine de motos e gostaria de mais informações.')}`;
+                document.getElementById('btnWhatsapp').href = whatsappUrl;
+                document.getElementById('whatsappFloat').href = whatsappUrl;
+            }
+
+            if (vitrineData.instagram) {
+                document.getElementById('btnInstagram').href = `https://instagram.com/${vitrineData.instagram}`;
+                document.getElementById('btnInstagram').style.display = 'flex';
+            }
+
+            // Informações de contato
+            renderInfoContato();
+
+            // Filtros de categoria
+            renderFiltros();
+
+            // Produtos
+            renderProdutos();
+
+            // Mostrar conteúdo
+            setTimeout(() => {
+                document.getElementById('splashScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('splashScreen').style.display = 'none';
+                    document.getElementById('vitrineContent').style.display = 'block';
+                }, 300);
+            }, 1500);
+        }
+
+        function renderInfoContato() {
+            const lista = document.getElementById('infoLista');
+            let html = '';
+
+            if (vitrineData.whatsapp) {
+                html += `
+                    <div class="info-item">
+                        <span class="info-icon">💬</span>
+                        <span class="info-text">(${vitrineData.whatsapp.substring(0,2)}) ${vitrineData.whatsapp.substring(2,7)}-${vitrineData.whatsapp.substring(7)}</span>
+                    </div>
+                `;
+            }
+
+            if (vitrineData.instagram) {
+                html += `
+                    <div class="info-item">
+                        <span class="info-icon">📸</span>
+                        <span class="info-text">@${vitrineData.instagram}</span>
+                    </div>
+                `;
+            }
+
+            if (vitrineData.email_contato) {
+                html += `
+                    <div class="info-item">
+                        <span class="info-icon">✉️</span>
+                        <span class="info-text">${vitrineData.email_contato}</span>
+                    </div>
+                `;
+            }
+
+            if (vitrineData.endereco) {
+                html += `
+                    <div class="info-item">
+                        <span class="info-icon">📍</span>
+                        <span class="info-text">${vitrineData.endereco}</span>
+                    </div>
+                `;
+            }
+
+            lista.innerHTML = html;
+
+            if (!html) {
+                document.getElementById('vitrineInfoContato').style.display = 'none';
+            }
+        }
+
+        function renderFiltros() {
+            const categorias = [...new Set(produtosData.map(p => p.categoria).filter(c => c))];
+            const container = document.querySelector('.filtros-scroll');
+
+            let html = '<button class="filtro-btn active" data-categoria="todas">Todas</button>';
+
+            categorias.forEach(cat => {
+                const catInfo = CONFIG.CATEGORIAS_MOTOS.find(c => c.id === cat);
+                if (catInfo) {
+                    html += `<button class="filtro-btn" data-categoria="${cat}">${catInfo.icone} ${catInfo.nome}</button>`;
+                }
+            });
+
+            container.innerHTML = html;
+
+            // Event listeners
+            container.querySelectorAll('.filtro-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    container.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    categoriaAtiva = this.dataset.categoria;
+                    renderProdutos();
+                });
+            });
+
+            // Esconder se só tiver uma categoria
+            if (categorias.length <= 1) {
+                document.getElementById('vitrineFiltros').style.display = 'none';
+            }
+        }
+
+        function renderProdutos() {
+            const container = document.getElementById('catalogoGrid');
+            const empty = document.getElementById('catalogoEmpty');
+
+            let produtos = produtosData;
+
+            if (categoriaAtiva !== 'todas') {
+                produtos = produtos.filter(p => p.categoria === categoriaAtiva);
+            }
+
+            if (produtos.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+
+            container.innerHTML = produtos.map(produto => `
+                <div class="produto-card ${produto.destaque ? 'destaque' : ''}" onclick="abrirDetalhe('${produto.id}')">
+                    <div class="produto-imagem">
+                        ${produto.imagens && produto.imagens.length > 0 
+                            ? `<img src="${produto.imagens[0]}" alt="${produto.nome}">`
+                            : `<div class="produto-placeholder">🏍️</div>`
+                        }
+                        ${produto.destaque ? '<span class="produto-badge">⭐ Destaque</span>' : ''}
+                        ${produto.imagens && produto.imagens.length > 1 ? `<span class="produto-imgs">${produto.imagens.length} 📷</span>` : ''}
+                    </div>
+                    <div class="produto-info">
+                        <h3 class="produto-nome">${produto.nome}</h3>
+                        <p class="produto-categoria">${getCategoriaLabel(produto.categoria)}</p>
+                        <p class="produto-preco">${produto.preco || 'Consulte'}</p>
+                    </div>
+                    <button class="btn btn-whatsapp btn-sm btn-full" onclick="event.stopPropagation(); enviarWhatsapp('${produto.nome}')">
+                        💬 Tenho interesse
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function getCategoriaLabel(categoria) {
+            const cat = CONFIG.CATEGORIAS_MOTOS.find(c => c.id === categoria);
+            return cat ? `${cat.icone} ${cat.nome}` : '';
+        }
+
+        // ==========================================
+        // INTERAÇÕES
+        // ==========================================
+
+        function abrirDetalhe(produtoId) {
+            const produto = produtosData.find(p => p.id === produtoId);
+            if (!produto) return;
+
+            document.getElementById('detalheNome').textContent = produto.nome;
+            document.getElementById('detalhePreco').textContent = produto.preco || 'Consulte';
+            document.getElementById('detalheAno').textContent = produto.ano || '';
+            document.getElementById('detalheCategoria').textContent = getCategoriaLabel(produto.categoria);
+            document.getElementById('detalheDescricao').textContent = produto.descricao || 'Sem descrição disponível.';
+
+            // Galeria
+            const galeria = document.getElementById('detalheGaleria');
+            if (produto.imagens && produto.imagens.length > 0) {
+                galeria.innerHTML = produto.imagens.map((img, index) => `
+                    <div class="galeria-item" onclick="openImageModal(${JSON.stringify(produto.imagens).replace(/"/g, '&quot;')}, ${index})">
+                        <img src="${img}" alt="${produto.nome} - Imagem ${index + 1}">
+                    </div>
+                `).join('');
+            } else {
+                galeria.innerHTML = '<div class="galeria-placeholder">🏍️</div>';
+            }
+
+            // WhatsApp
+            if (vitrineData.whatsapp) {
+                const msg = `Olá! Vi a moto ${produto.nome} na sua vitrine e gostaria de mais informações.`;
+                document.getElementById('detalheWhatsapp').href = `https://wa.me/55${vitrineData.whatsapp}?text=${encodeURIComponent(msg)}`;
+            }
+
+            document.getElementById('motoDetalheModal').classList.add('active');
+        }
+
+        function closeMotoDetalhe() {
+            document.getElementById('motoDetalheModal').classList.remove('active');
+        }
+
+        function enviarWhatsapp(motoNome) {
+            if (vitrineData.whatsapp) {
+                const msg = `Olá! Vi a moto ${motoNome} na sua vitrine e gostaria de mais informações.`;
+                window.open(`https://wa.me/55${vitrineData.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        // ==========================================
+        // MODAL DE IMAGEM
+        // ==========================================
+
+        function openImageModal(images, index) {
+            currentImages = images;
+            currentImageIndex = index;
+            updateModalImage();
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        function updateModalImage() {
+            document.getElementById('modalImage').src = currentImages[currentImageIndex];
+            document.getElementById('imageCounter').textContent = `${currentImageIndex + 1}/${currentImages.length}`;
+        }
+
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+            updateModalImage();
+        }
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+            updateModalImage();
+        }
+
+        // ==========================================
+        // NÃO ENCONTRADO
+        // ==========================================
+
+        function showNotFound() {
+            document.getElementById('splashScreen').style.display = 'none';
+            document.getElementById('vitrineNotFound').style.display = 'flex';
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('imageModal').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') prevImage();
+                if (e.key === 'ArrowRight') nextImage();
+                if (e.key === 'Escape') closeImageModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolha seu Plano - Vitrine do Vendedor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           PLANOS PAGE - CSS INTERNO
+           ============================================ */
+        
+        /* Reset & Variáveis */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --color-primary: #e31837;
+            --color-primary-dark: #c41230;
+            --color-primary-light: rgba(227, 24, 55, 0.1);
+            --color-primary-gradient: linear-gradient(135deg, #e31837 0%, #c41230 100%);
+            --color-text-primary: #1a1a2e;
+            --color-text-secondary: #4a4a68;
+            --color-text-muted: #6b6b8a;
+            --color-text-inverse: #ffffff;
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #f8f9fa;
+            --color-border: #e8e8ed;
+            --color-success: #28a745;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --shadow-primary: 0 4px 14px rgba(227, 24, 55, 0.3);
+            --shadow-xl: 0 15px 35px rgba(0, 0, 0, 0.1);
+            --transition-base: 0.3s ease;
+            --header-height: 72px;
+        }
+        
+        /* Base */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background: linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%);
+            min-height: 100vh;
+        }
+        
+        a { color: var(--color-primary); text-decoration: none; }
+        
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+        
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .logo-icon { font-size: 1.5rem; }
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-user span {
+            font-size: 0.9375rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* Botões */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1;
+            text-decoration: none;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .btn-primary {
+            background: var(--color-primary-gradient);
+            color: var(--color-text-inverse);
+            box-shadow: var(--shadow-primary);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(227, 24, 55, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border-color: var(--color-border);
+            color: var(--color-text-primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--color-bg-secondary);
+            border-color: #d0d0d5;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.8125rem;
+        }
+        
+        .btn-full { width: 100%; }
+        
+        /* Section Header */
+        .section-header {
+            max-width: 600px;
+            margin: 0 auto 48px;
+            text-align: center;
+        }
+        
+        .section-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            margin-bottom: 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-primary);
+            background: var(--color-primary-light);
+            border-radius: 100px;
+        }
+        
+        .section-header h1 {
+            margin-bottom: 16px;
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--color-text-secondary);
+        }
+        
+        /* Planos Section */
+        .planos-section {
+            padding: 140px 0 100px;
+        }
+        
+        /* Billing Toggle */
+        .billing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+        
+        .billing-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: color var(--transition-base);
+        }
+        
+        .billing-option.active {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 28px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--color-border);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background var(--transition-base);
+        }
+        
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: var(--color-bg-primary);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform var(--transition-base);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--color-primary);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider::after {
+            transform: translateX(28px);
+        }
+        
+        .discount-badge {
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-text-inverse);
+            background: var(--color-success);
+            border-radius: 100px;
+        }
+        
+        /* Planos Grid */
+        .planos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        /* Plano Card */
+        .plano-card {
+            position: relative;
+            padding: 40px 32px;
+            background: var(--color-bg-primary);
+            border: 2px solid var(--color-border);
+            border-radius: 20px;
+            transition: all var(--transition-base);
+        }
+        
+        .plano-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .plano-card.plano-destaque {
+            border-color: var(--color-primary);
+            box-shadow: 0 10px 40px rgba(227, 24, 55, 0.15);
+        }
+        
+        .plano-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-text-inverse);
+            background: var(--color-primary-gradient);
+            border-radius: 100px;
+        }
+        
+        .plano-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        .plano-header h3 {
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .plano-preco {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .preco-valor {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--color-text-primary);
+        }
+        
+        .preco-periodo {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+        }
+        
+        .preco-original {
+            margin-top: 4px;
+            font-size: 0.875rem;
+            color: #999;
+            text-decoration: line-through;
+            text-align: center;
+        }
+        
+        /* Plano Recursos */
+        .plano-recursos {
+            margin-bottom: 32px;
+            list-style: none;
+        }
+        
+        .plano-recursos li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .plano-recursos li:last-child { border-bottom: none; }
+        
+        .plano-recursos li .check {
+            font-weight: 700;
+            color: var(--color-success);
+        }
+        
+        .plano-recursos li .x {
+            font-weight: 700;
+            color: #ddd;
+        }
+        
+        .plano-recursos li.disabled {
+            color: #bbb;
+        }
+        
+        /* Footer Simples */
+        .footer-simple {
+            padding: 24px 0;
+            text-align: center;
+        }
+        
+        .footer-simple p {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 11000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            color: var(--color-text-inverse);
+            background: #1a1a2e;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all var(--transition-base);
+        }
+        
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success { background: var(--color-success); }
+        .toast.error { background: #dc3545; }
+        
+        /* Loader */
+        .global-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 12000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .global-loader.active { display: flex; }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 16px;
+            border: 4px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .planos-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .planos-section { padding: 120px 0 60px; }
+            .section-header h1 { font-size: 1.75rem; }
+        }
+        
+        @media (max-width: 480px) {
+            .container { padding: 0 16px; }
+            .plano-card { padding: 32px 24px; }
+        }
+        
+        /* ============================================
+           MODAL DE PAGAMENTO - CENTRALIZADO
+           ============================================ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--color-bg-primary);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 0;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-secondary);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: var(--color-primary-light);
+            color: var(--color-primary);
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            padding: 0 24px 24px;
+        }
+        
+        /* Checkout Summary */
+        .checkout-summary {
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .checkout-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .checkout-item.total {
+            border-top: 2px solid var(--color-border);
+            margin-top: 12px;
+            padding-top: 16px;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+        
+        .checkout-label {
+            color: var(--color-text-secondary);
+        }
+        
+        .checkout-value {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .checkout-item.total .checkout-value {
+            color: var(--color-primary);
+            font-size: 1.25rem;
+        }
+        
+        /* Métodos de Pagamento */
+        .metodos-pagamento h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-text-primary);
+        }
+        
+        .metodos-grid {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .metodo-option {
+            flex: 1;
+            position: relative;
+        }
+        
+        .metodo-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .metodo-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 16px 12px;
+            background: var(--color-bg-secondary);
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        
+        .metodo-option label:hover {
+            border-color: var(--color-primary);
+        }
+        
+        .metodo-option.active label,
+        .metodo-option input:checked + label {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
+        }
+        
+        .metodo-icon {
+            font-size: 1.5rem;
+        }
+        
+        /* Forms de Pagamento */
+        .form-pagamento {
+            display: none;
+        }
+        
+        .form-pagamento.active,
+        .form-pagamento[style*="display: block"] {
+            display: block;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+        
+        .form-group input {
+            padding: 12px 14px;
+            border: 2px solid var(--color-border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        
+        /* Pix e Boleto Info */
+        .pix-info, .boleto-info {
+            text-align: center;
+            padding: 20px;
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+        }
+        
+        .pix-info .icon, .boleto-info .icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+        
+        .pix-info p, .boleto-info p {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Alert */
+        .alert {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+        
+        .alert.active,
+        .alert[style*="display: flex"] {
+            display: flex;
+        }
+        
+        .alert-error {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        /* Modal Buttons */
+        .modal-footer .btn {
+            width: 100%;
+        }
+        
+        .btn-loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-loading .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        /* Trial Badge */
+        .trial-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        /* Checkout Resumo */
+        .checkout-resumo {
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .checkout-resumo h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--color-text-primary);
+        }
+        
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 0.95rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .resumo-trial {
+            color: var(--color-success);
+            font-weight: 500;
+        }
+        
+        .resumo-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 16px;
+            margin-top: 12px;
+            border-top: 2px solid var(--color-border);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--color-text-primary);
+        }
+        
+        .resumo-total span:last-child {
+            color: var(--color-primary);
+        }
+        
+        /* Checkout Metodos */
+        .checkout-metodos {
+            margin-bottom: 20px;
+        }
+        
+        .checkout-metodos h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-text-primary);
+        }
+        
+        .metodo-opcoes {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .metodo-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 10px;
+            background: var(--color-bg-secondary);
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        
+        .metodo-option:hover {
+            border-color: var(--color-primary);
+        }
+        
+        .metodo-option.active {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
+        }
+        
+        .metodo-option input {
+            display: none;
+        }
+        
+        .metodo-icon {
+            font-size: 1.5rem;
+        }
+        
+        /* Checkout Form */
+        .checkout-form {
+            margin-top: 20px;
+        }
+        
+        .checkout-seguranca {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* Responsive Modal */
+        @media (max-width: 540px) {
+            .modal {
+                padding: 10px;
+            }
+            
+            .modal-content {
+                max-height: 95vh;
+            }
+            
+            .metodo-opcoes {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="planos-page">
+    <!-- Header -->
+    <header class="header header-simple">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🏍️</span>
+                <span class="logo-text">Vitrine do Vendedor</span>
+            </a>
+            <div class="header-user" id="headerUser" style="display: none;">
+                <span id="userEmail"></span>
+                <a href="#" onclick="auth.logout()" class="btn btn-outline btn-sm">Sair</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Planos Section -->
+    <section class="planos-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Planos</span>
+                <h1>Escolha o plano ideal para você</h1>
+                <p>Comece com 7 dias grátis. Cancele quando quiser.</p>
+            </div>
+
+            <!-- Toggle Mensal/Anual -->
+            <div class="billing-toggle">
+                <span class="billing-option active" data-billing="mensal">Mensal</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="billingToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="billing-option" data-billing="anual">
+                    Anual
+                    <span class="discount-badge">-17%</span>
+                </span>
+            </div>
+
+            <!-- Cards de Planos -->
+            <div class="planos-grid" id="planosGrid">
+                <!-- Plano Básico -->
+                <div class="plano-card" data-plano="basico">
+                    <div class="plano-header">
+                        <h3>Básico</h3>
+                        <div class="plano-preco">
+                            <span class="preco-valor" data-mensal="29.90" data-anual="299.00">R$ 29,90</span>
+                            <span class="preco-periodo">/mês</span>
+                        </div>
+                    </div>
+                    <ul class="plano-recursos">
+                        <li><span class="check">✓</span> Vitrine personalizada</li>
+                        <li><span class="check">✓</span> Até 10 motos</li>
+                        <li><span class="check">✓</span> Link personalizado</li>
+                        <li><span class="check">✓</span> Botão WhatsApp</li>
+                        <li><span class="check">✓</span> Suporte por email</li>
+                        <li class="disabled"><span class="x">✕</span> Dashboard com métricas</li>
+                        <li class="disabled"><span class="x">✕</span> Destaque nas buscas</li>
+                    </ul>
+                    <button class="btn btn-outline btn-full" onclick="selecionarPlano('basico')">
+                        Começar grátis
+                    </button>
+                </div>
+
+                <!-- Plano Profissional -->
+                <div class="plano-card plano-destaque" data-plano="profissional">
+                    <div class="plano-badge">Mais popular</div>
+                    <div class="plano-header">
+                        <h3>Profissional</h3>
+                        <div class="plano-preco">
+                            <span class="preco-valor" data-mensal="49.90" data-anual="499.00">R$ 49,90</span>
+                            <span class="preco-periodo">/mês</span>
+                        </div>
+                    </div>
+                    <ul class="plano-recursos">
+                        <li><span class="check">✓</span> Tudo do Básico</li>
+                        <li><span class="check">✓</span> <strong>Motos ilimitadas</strong></li>
+                        <li><span class="check">✓</span> Múltiplas imagens por moto</li>
+                        <li><span class="check">✓</span> Dashboard com métricas</li>
+                        <li><span class="check">✓</span> Destaque nas buscas</li>
+                        <li><span class="check">✓</span> Suporte prioritário</li>
+                        <li class="disabled"><span class="x">✕</span> Domínio personalizado</li>
+                    </ul>
+                    <button class="btn btn-primary btn-full" onclick="selecionarPlano('profissional')">
+                        Começar grátis
+                    </button>
+                </div>
+
+                <!-- Plano Premium -->
+                <div class="plano-card" data-plano="premium">
+                    <div class="plano-header">
+                        <h3>Premium</h3>
+                        <div class="plano-preco">
+                            <span class="preco-valor" data-mensal="99.90" data-anual="999.00">R$ 99,90</span>
+                            <span class="preco-periodo">/mês</span>
+                        </div>
+                    </div>
+                    <ul class="plano-recursos">
+                        <li><span class="check">✓</span> Tudo do Profissional</li>
+                        <li><span class="check">✓</span> <strong>Domínio personalizado</strong></li>
+                        <li><span class="check">✓</span> Remoção da marca</li>
+                        <li><span class="check">✓</span> Relatórios avançados</li>
+                        <li><span class="check">✓</span> Integração com CRM</li>
+                        <li><span class="check">✓</span> Gerente dedicado</li>
+                        <li><span class="check">✓</span> Suporte 24/7</li>
+                    </ul>
+                    <button class="btn btn-outline btn-full" onclick="selecionarPlano('premium')">
+                        Começar grátis
+                    </button>
+                </div>
+            </div>
+
+            <!-- Garantia -->
+            <div class="garantia-box">
+                <span class="garantia-icon">🛡️</span>
+                <div class="garantia-text">
+                    <strong>Garantia de 7 dias</strong>
+                    <p>Teste grátis por 7 dias. Se não gostar, não paga nada.</p>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="planos-faq">
+                <h2>Perguntas frequentes</h2>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Posso cancelar a qualquer momento?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Sim! Você pode cancelar sua assinatura a qualquer momento. Não há fidelidade ou multa.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Como funciona o período de teste?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Você tem 7 dias para testar todas as funcionalidades. Só começamos a cobrar depois desse período.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Posso mudar de plano depois?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Claro! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento pelo painel.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Quais formas de pagamento são aceitas?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Aceitamos cartão de crédito, boleto bancário e PIX.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de Pagamento -->
+    <div id="pagamentoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Finalizar assinatura</h2>
+                <button class="modal-close" onclick="closeModal('pagamentoModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="checkout-resumo">
+                    <h4>Resumo do pedido</h4>
+                    <div class="resumo-item">
+                        <span>Plano <span id="checkoutPlano">Profissional</span></span>
+                        <span id="checkoutPreco">R$ 49,90/mês</span>
+                    </div>
+                    <div class="resumo-item resumo-trial">
+                        <span>🎁 7 dias grátis</span>
+                        <span>R$ 0,00</span>
+                    </div>
+                    <div class="resumo-total">
+                        <span>Primeira cobrança em 7 dias</span>
+                        <span id="checkoutTotal">R$ 49,90</span>
+                    </div>
+                </div>
+
+                <div class="checkout-metodos">
+                    <h4>Forma de pagamento</h4>
+                    <div class="metodo-opcoes">
+                        <label class="metodo-option active">
+                            <input type="radio" name="metodo" value="cartao" checked>
+                            <span class="metodo-icon">💳</span>
+                            <span>Cartão de Crédito</span>
+                        </label>
+                        <label class="metodo-option">
+                            <input type="radio" name="metodo" value="pix">
+                            <span class="metodo-icon">📱</span>
+                            <span>PIX</span>
+                        </label>
+                        <label class="metodo-option">
+                            <input type="radio" name="metodo" value="boleto">
+                            <span class="metodo-icon">📄</span>
+                            <span>Boleto</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Formulário Cartão -->
+                <div id="formCartao" class="checkout-form">
+                    <div class="form-group">
+                        <label>Número do Cartão</label>
+                        <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Validade</label>
+                            <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="text" id="cardCvv" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome no Cartão</label>
+                        <input type="text" id="cardName" placeholder="Como está no cartão">
+                    </div>
+                </div>
+
+                <!-- PIX -->
+                <div id="formPix" class="checkout-form" style="display: none;">
+                    <div class="pix-info">
+                        <p>Ao confirmar, será gerado um QR Code PIX para pagamento.</p>
+                        <p>A ativação é instantânea após o pagamento.</p>
+                    </div>
+                </div>
+
+                <!-- Boleto -->
+                <div id="formBoleto" class="checkout-form" style="display: none;">
+                    <div class="boleto-info">
+                        <p>O boleto será gerado e enviado para seu email.</p>
+                        <p>A ativação ocorre em até 3 dias úteis após o pagamento.</p>
+                    </div>
+                </div>
+
+                <div id="checkoutError" class="alert alert-error" style="display: none;">
+                    <span class="alert-icon">✕</span>
+                    <span class="alert-text"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-full btn-large" id="btnConfirmar" onclick="confirmarPagamento()">
+                    <span class="btn-text">Iniciar teste grátis</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="spinner"></span> Processando...
+                    </span>
+                </button>
+                <p class="checkout-seguranca">
+                    🔒 Pagamento 100% seguro
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Simples -->
+    <footer class="footer-simple">
+        <div class="container">
+            <p>© 2026 Vitrine do Vendedor. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/payment.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let planoSelecionado = null;
+        let billingAnual = false;
+
+        // Verificar se usuário está logado
+        document.addEventListener('DOMContentLoaded', function() {
+            if (auth.isAuthenticated()) {
+                const user = auth.getCurrentUser();
+                if (user && user.id) {
+                    document.getElementById('headerUser').style.display = 'flex';
+                    document.getElementById('userEmail').textContent = user.email;
+                    
+                    // Verificar se já tem assinatura
+                    const subscription = db.getSubscriptionByUserId(user.id);
+                    if (subscription && subscription.status !== 'cancelado') {
+                        window.location.href = 'painel.html';
+                        return;
+                    }
+                }
+            }
+            
+            // Toggle billing
+            const billingToggle = document.getElementById('billingToggle');
+            if (billingToggle) {
+                billingToggle.addEventListener('change', function() {
+                    billingAnual = this.checked;
+                    document.querySelectorAll('.billing-option').forEach(el => el.classList.remove('active'));
+                    document.querySelector(`[data-billing="${billingAnual ? 'anual' : 'mensal'}"]`).classList.add('active');
+                    
+                    // Atualizar preços
+                    document.querySelectorAll('.preco-valor').forEach(el => {
+                        const valor = billingAnual ? el.dataset.anual : el.dataset.mensal;
+                        el.textContent = `R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`;
+                    });
+                    
+                    document.querySelectorAll('.preco-periodo').forEach(el => {
+                        el.textContent = billingAnual ? '/ano' : '/mês';
+                    });
+                });
+            }
+
+            // Métodos de pagamento
+            document.querySelectorAll('.metodo-option input').forEach(input => {
+                input.addEventListener('change', function() {
+                    document.querySelectorAll('.metodo-option').forEach(el => el.classList.remove('active'));
+                    this.closest('.metodo-option').classList.add('active');
+                    
+                    document.getElementById('formCartao').style.display = this.value === 'cartao' ? 'block' : 'none';
+                    document.getElementById('formPix').style.display = this.value === 'pix' ? 'block' : 'none';
+                    document.getElementById('formBoleto').style.display = this.value === 'boleto' ? 'block' : 'none';
+                });
+            });
+        });
+
+        function selecionarPlano(planoId) {
+            planoSelecionado = planoId;
+            const plano = CONFIG.PLANOS[planoId];
+            const preco = billingAnual ? plano.precoAnual : plano.preco;
+            const periodo = billingAnual ? '/ano' : '/mês';
+
+            document.getElementById('checkoutPlano').textContent = plano.nome;
+            document.getElementById('checkoutPreco').textContent = `R$ ${preco.toFixed(2).replace('.', ',')}${periodo}`;
+            document.getElementById('checkoutTotal').textContent = `R$ ${preco.toFixed(2).replace('.', ',')}`;
+
+            openModal('pagamentoModal');
+        }
+
+        async function confirmarPagamento() {
+            const btn = document.getElementById('btnConfirmar');
+            const btnText = btn.querySelector('.btn-text');
+            const btnLoading = btn.querySelector('.btn-loading');
+            const errorDiv = document.getElementById('checkoutError');
+
+            errorDiv.style.display = 'none';
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-flex';
+            btn.disabled = true;
+
+            try {
+                const metodo = document.querySelector('input[name="metodo"]:checked').value;
+
+                // Simular processamento do pagamento
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Verificar se usuário está logado
+                if (!auth.isAuthenticated()) {
+                    // Salvar dados do pagamento aprovado para finalizar após login
+                    sessionStorage.setItem('pagamentoAprovado', JSON.stringify({
+                        plano: planoSelecionado,
+                        metodo: metodo,
+                        billingAnual: billingAnual
+                    }));
+                    
+                    closeModal('pagamentoModal');
+                    alert('✅ Pagamento pré-aprovado! Agora crie sua conta para ativar os 7 dias grátis.');
+                    window.location.href = 'cadastro.html';
+                    return;
+                }
+
+                // Usuário logado - criar assinatura diretamente
+                const user = auth.getFullCurrentUser();
+                const result = await payment.createSubscription(user.id, planoSelecionado, {
+                    method: metodo
+                });
+
+                closeModal('pagamentoModal');
+                alert('🎉 Assinatura ativada com sucesso! Você tem 7 dias grátis para testar.');
+                window.location.href = 'painel.html';
+
+            } catch (error) {
+                errorDiv.querySelector('.alert-text').textContent = error.message;
+                errorDiv.style.display = 'flex';
+            } finally {
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        function toggleFaq(btn) {
+            const item = btn.closest('.faq-item');
+            item.classList.toggle('active');
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Máscara cartão
+        document.getElementById('cardNumber')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+            e.target.value = value;
+        });
+
+        document.getElementById('cardExpiry')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

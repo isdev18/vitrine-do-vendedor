@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contato - Vitrine do Vendedor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           CONTATO PAGE - CSS INTERNO
+           ============================================ */
+        
+        /* Reset & Variáveis */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --color-primary: #e31837;
+            --color-primary-dark: #c41230;
+            --color-primary-light: rgba(227, 24, 55, 0.1);
+            --color-text-primary: #1a1a2e;
+            --color-text-secondary: #4a4a68;
+            --color-text-muted: #6b6b8a;
+            --color-text-inverse: #ffffff;
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #f8f9fa;
+            --color-bg-dark: #1a1a2e;
+            --color-border: #e8e8ed;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --shadow-xl: 0 15px 35px rgba(0, 0, 0, 0.1);
+            --transition-base: 0.3s ease;
+            --header-height: 72px;
+        }
+        
+        /* Base */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background: var(--color-bg-primary);
+        }
+        
+        a { color: var(--color-primary); text-decoration: none; }
+        
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+        
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .logo-icon { font-size: 1.5rem; }
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        .nav {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .nav a {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .nav a:hover { color: var(--color-primary); }
+        
+        .btn-header {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--color-text-inverse);
+            background: var(--color-primary);
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+        
+        .btn-header:hover { background: var(--color-primary-dark); }
+        
+        /* Section Header */
+        .section-header {
+            max-width: 600px;
+            margin: 0 auto 60px;
+            text-align: center;
+        }
+        
+        .section-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            margin-bottom: 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-primary);
+            background: var(--color-primary-light);
+            border-radius: 100px;
+        }
+        
+        .section-header h1 {
+            margin-bottom: 16px;
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--color-text-secondary);
+        }
+        
+        /* Contact Hero */
+        .contact-hero {
+            min-height: calc(100vh - 200px);
+            padding: 160px 0 100px;
+            background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%);
+        }
+        
+        /* Contact Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .contact-card {
+            display: block;
+            padding: 40px 32px;
+            text-align: center;
+            text-decoration: none;
+            background: var(--color-bg-primary);
+            border: 2px solid #f0f0f0;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all var(--transition-base);
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .contact-icon {
+            margin-bottom: 20px;
+            font-size: 3rem;
+        }
+        
+        .contact-card h3 {
+            margin-bottom: 8px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        .contact-card p {
+            margin-bottom: 16px;
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .contact-action {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            transition: color 0.2s ease;
+        }
+        
+        .contact-card:hover .contact-action {
+            color: var(--color-primary-dark);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 60px 0 24px;
+            background: var(--color-bg-dark);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer-brand .logo-text {
+            color: var(--color-text-inverse);
+        }
+        
+        .footer-brand p {
+            margin-top: 8px;
+            font-size: 0.9375rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .footer-links a {
+            font-size: 0.9375rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .footer-links a:hover { color: var(--color-text-inverse); }
+        
+        .footer-bottom {
+            padding-top: 24px;
+            text-align: center;
+        }
+        
+        .footer-bottom p {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 32px;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container { padding: 0 16px; }
+            .contact-hero { padding: 120px 0 60px; }
+            .section-header h1 { font-size: 1.75rem; }
+            .contact-card { padding: 32px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🏍️</span>
+                <span class="logo-text">Vitrine do Vendedor</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html#como-funciona">Como funciona</a>
+                <a href="index.html#funcionalidades">Funcionalidades</a>
+                <a href="index.html#beneficios">Benefícios</a>
+                <a href="contato.html">Contato</a>
+            </nav>
+            <a href="contato.html" class="btn btn-header">Criar minha vitrine</a>
+        </div>
+    </header>
+
+    <!-- Contato Hero -->
+    <section class="contact-hero">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Contato</span>
+                <h1>Vamos criar sua vitrine?</h1>
+                <p>Entre em contato através do canal de sua preferência. Estamos prontos para ajudar você a vender mais!</p>
+            </div>
+            <div class="contact-grid">
+                <a href="https://wa.me/5571996914231" target="_blank" class="contact-card">
+                    <div class="contact-icon">💬</div>
+                    <h3>WhatsApp</h3>
+                    <p>(71) 99691-4231</p>
+                    <span class="contact-action">Enviar mensagem →</span>
+                </a>
+                <a href="mailto:isaque8089@gmail.com" class="contact-card">
+                    <div class="contact-icon">📧</div>
+                    <h3>E-mail</h3>
+                    <p>isaque8089@gmail.com</p>
+                    <span class="contact-action">Enviar e-mail →</span>
+                </a>
+                <a href="https://instagram.com/is_eng_software" target="_blank" class="contact-card">
+                    <div class="contact-icon">📸</div>
+                    <h3>Instagram</h3>
+                    <p>@is_eng_software</p>
+                    <span class="contact-action">Seguir no Instagram →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon">🏍️</span>
+                        <span class="logo-text">Vitrine do Vendedor</span>
+                    </a>
+                    <p>A vitrine digital para vendedores de motos Honda.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html#o-que-e">O que é</a>
+                    <a href="index.html#como-funciona">Como funciona</a>
+                    <a href="index.html#funcionalidades">Funcionalidades</a>
+                    <a href="index.html#beneficios">Benefícios</a>
+                    <a href="contato.html">Contato</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Vitrine do Vendedor. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
