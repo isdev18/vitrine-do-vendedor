@@ -1,55 +1,32 @@
 {
-  "version": 2,
-  "name": "vitrine-do-vendedor",
-  "builds": [
+  "rewrites": [
     {
-      "src": "**/*.html",
-      "use": "@vercel/static"
+      "source": "/vitrine",
+      "destination": "/vitrine.html"
     },
     {
-      "src": "**/*.css",
-      "use": "@vercel/static"
+      "source": "/painel",
+      "destination": "/painel.html"
     },
     {
-      "src": "**/*.js",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/vitrine",
-      "dest": "/vitrine.html"
+      "source": "/login",
+      "destination": "/login.html"
     },
     {
-      "src": "/painel",
-      "dest": "/painel.html"
+      "source": "/cadastro",
+      "destination": "/cadastro.html"
     },
     {
-      "src": "/login",
-      "dest": "/login.html"
+      "source": "/planos",
+      "destination": "/planos.html"
     },
     {
-      "src": "/cadastro",
-      "dest": "/cadastro.html"
+      "source": "/admin",
+      "destination": "/admin.html"
     },
     {
-      "src": "/planos",
-      "dest": "/planos.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/admin.html"
-    },
-    {
-      "src": "/contato",
-      "dest": "/contato.html"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/contato",
+      "destination": "/contato.html"
     }
   ],
   "headers": [
