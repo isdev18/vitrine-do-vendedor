@@ -21,8 +21,12 @@ app = Flask(__name__)
 # ==========================================
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'vitrine-vendedor-secret-2026')
 
-# Database - Sempre usa SQLite (banco local no código)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vitrine_vendedor.db'
+# Database - Usa DATABASE_URL se disponível (Railway/PostgreSQL), senão SQLite local
+database_url = os.getenv('DATABASE_URL')
+if database_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vitrine_vendedor.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JSON_AS_ASCII'] = False
 
