@@ -16,7 +16,7 @@ const CONFIG = {
     API_URL: 'https://vitrine-do-vendedor-production.up.railway.app/api',
     
     // Usar API real ou localStorage
-    USE_API: true, // Usando localStorage por enquanto (mais estável)
+    USE_API: false, // Usando localStorage por enquanto (mais estável)
     
     // Planos e Preços
     PLANOS: {
