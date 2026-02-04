@@ -8,9 +8,8 @@ Flask==3.0.0
 Flask-CORS==4.0.0
 Flask-SQLAlchemy==3.1.1
 
-# Database - SQLite (nativo, sem dependências extras) e PostgreSQL para Railway
+# Database - SQLite (nativo, sem dependências extras)
 SQLAlchemy==2.0.36
-psycopg2-binary==2.9.9
 
 # Authentication
 PyJWT==2.8.0
