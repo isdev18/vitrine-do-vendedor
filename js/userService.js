@@ -188,3 +188,26 @@ const CONFIG = {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = CONFIG;
 }
+
+function login(credentials) {
+	return window.apiClient.post(CONFIG.API.AUTH.LOGIN, credentials)
+		.then(res => {
+			// salvar token em sessionStorage (evita uso de localStorage se preferir)
+			if (res && res.token) sessionStorage.setItem('token', res.token);
+			return res;
+		});
+}
+
+function logout() {
+	// informar backend e limpar sessão local
+	return window.apiClient.post(CONFIG.API.AUTH.LOGOUT, {})
+		.finally(()=> sessionStorage.removeItem('token'));
+}
+
+function getProfile() {
+	return window.apiClient.get(CONFIG.API.USER.PROFILE);
+}
+
+function updateProfile(data) {
+	return window.apiClient.put(CONFIG.API.USER.UPDATE, data);
+}

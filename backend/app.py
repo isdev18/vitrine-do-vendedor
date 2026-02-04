@@ -5,7 +5,7 @@ Servidor principal - Produção
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
+
 from datetime import datetime
 import os
 
@@ -59,77 +59,13 @@ CORS(app, origins=[
 # ==========================================
 # DATABASE
 # ==========================================
-db = SQLAlchemy(app)
+from extensions import db
+db.init_app(app)
 
-# ==========================================
-# MODELOS
-# ==========================================
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
-    phone = db.Column(db.String(20))
-    role = db.Column(db.String(20), default='user')
-    status = db.Column(db.String(20), default='active')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    vitrine = db.relationship('Vitrine', backref='owner', uselist=False)
-    subscription = db.relationship('Subscription', backref='user', uselist=False)
-
-
-class Vitrine(db.Model):
-    __tablename__ = 'vitrines'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    name = db.Column(db.String(100), nullable=False)
-    slug = db.Column(db.String(100), unique=True, nullable=False)
-    description = db.Column(db.Text)
-    logo_url = db.Column(db.String(500))
-    banner_url = db.Column(db.String(500))
-    primary_color = db.Column(db.String(7), default='#e63946')
-    whatsapp = db.Column(db.String(20))
-    instagram = db.Column(db.String(100))
-    address = db.Column(db.String(200))
-    city = db.Column(db.String(100))
-    state = db.Column(db.String(2))
-    is_active = db.Column(db.Boolean, default=True)
-    views = db.Column(db.Integer, default=0)
-    whatsapp_clicks = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    produtos = db.relationship('Produto', backref='vitrine', lazy=True)
-
-
-class Produto(db.Model):
-    __tablename__ = 'produtos'
-    id = db.Column(db.Integer, primary_key=True)
-    vitrine_id = db.Column(db.Integer, db.ForeignKey('vitrines.id'), nullable=False)
-    name = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text)
-    price = db.Column(db.Float)
-    year = db.Column(db.Integer)
-    km = db.Column(db.Integer)
-    color = db.Column(db.String(50))
-    image_url = db.Column(db.String(500))
-    images = db.Column(db.Text)  # JSON array
-    is_featured = db.Column(db.Boolean, default=False)
-    is_active = db.Column(db.Boolean, default=True)
-    views = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-class Subscription(db.Model):
-    __tablename__ = 'subscriptions'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    plan = db.Column(db.String(20), default='basico')
-    status = db.Column(db.String(20), default='trial')  # trial, active, pending, overdue, cancelled, blocked
-    trial_end = db.Column(db.DateTime)
-    current_period_start = db.Column(db.DateTime)
-    current_period_end = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+# Importar models e criar tabelas (apenas as tabelas definidas em `models.py`)
+with app.app_context():
+    from models import User, Vitrine, Produto
+    db.create_all()
 
 
 # ==========================================
@@ -247,16 +183,7 @@ def register():
     db.session.add(user)
     db.session.commit()
     
-    # Criar assinatura trial
-    trial_end = datetime.utcnow() + timedelta(days=7)
-    subscription = Subscription(
-        user_id=user.id,
-        plan=data.get('plan', 'basico'),
-        status='trial',
-        trial_end=trial_end
-    )
-    db.session.add(subscription)
-    db.session.commit()
+    # Observação: o esquema atual não inclui tabela de assinaturas.
     
     # Gerar token
     token = generate_token(user.id)
@@ -360,7 +287,7 @@ def profile(user_id):
 def dashboard(user_id):
     user = User.query.get(user_id)
     vitrine = Vitrine.query.filter_by(user_id=user_id).first()
-    subscription = Subscription.query.filter_by(user_id=user_id).first()
+    subscription = None
     
     produtos_count = 0
     total_views = 0
@@ -582,9 +509,8 @@ def produtos_list(user_id):
         })
     
     if request.method == 'POST':
-        # Verificar limite de produtos
-        subscription = Subscription.query.filter_by(user_id=user_id).first()
-        plan = subscription.plan if subscription else 'basico'
+        # Verificar limite de produtos (sem tabela de assinaturas, usa plano padrão)
+        plan = 'basico'
         max_products = PLANS[plan]['max_products']
         
         current_count = Produto.query.filter_by(vitrine_id=vitrine.id).count()
@@ -687,28 +613,8 @@ def produto_detail(user_id, product_id):
 @app.route('/api/subscription/status')
 @token_required
 def subscription_status(user_id):
-    subscription = Subscription.query.filter_by(user_id=user_id).first()
-    
-    if not subscription:
-        return jsonify({
-            'success': True,
-            'subscription': None
-        })
-    
-    plan_info = PLANS.get(subscription.plan, PLANS['basico'])
-    
-    return jsonify({
-        'success': True,
-        'subscription': {
-            'plan': subscription.plan,
-            'plan_name': plan_info['name'],
-            'price': plan_info['price'],
-            'max_products': plan_info['max_products'],
-            'status': subscription.status,
-            'trial_end': subscription.trial_end.isoformat() if subscription.trial_end else None,
-            'current_period_end': subscription.current_period_end.isoformat() if subscription.current_period_end else None
-        }
-    })
+    # Tabela de assinaturas não está presente neste esquema; retornar None
+    return jsonify({'success': True, 'subscription': None})
 
 
 @app.route('/api/subscription/plans')
@@ -732,29 +638,11 @@ def select_plan(user_id):
     if plan not in PLANS:
         return jsonify({'success': False, 'message': 'Plano inválido'}), 400
     
-    subscription = Subscription.query.filter_by(user_id=user_id).first()
-    
-    if subscription:
-        subscription.plan = plan
-    else:
-        subscription = Subscription(
-            user_id=user_id,
-            plan=plan,
-            status='pending',
-            trial_end=datetime.utcnow() + timedelta(days=7)
-        )
-        db.session.add(subscription)
-    
-    db.session.commit()
-    
+    # A gestão de assinaturas não está implementada no esquema de banco atual.
     return jsonify({
-        'success': True,
-        'message': f'Plano {PLANS[plan]["name"]} selecionado!',
-        'subscription': {
-            'plan': plan,
-            'price': PLANS[plan]['price']
-        }
-    })
+        'success': False,
+        'message': 'Gestão de assinaturas não implementada no banco de dados atual.'
+    }), 400
 
 
 # ==========================================

@@ -13,7 +13,10 @@ const CONFIG = {
     APP_URL: IS_PRODUCTION ? 'https://vitrine-do-vendedor.vercel.app' : window.location.origin,
     
     // API Backend - Railway em produção
-    API_URL: 'https://vitrine-do-vendedor-production.up.railway.app', // removido '/api' do final
+    API_URL: 'https://vitrine-do-vendedor-production.up.railway.app/api', // Usando banco de dados do Railway
+    
+    // Usar API real ou localStorage
+    USE_API: true, // true = sempre usar API do Railway (banco de dados real)
     
     // Planos e Preços
     PLANOS: {
@@ -140,12 +143,7 @@ const CONFIG = {
 
     // API Endpoints (para integração futura com backend real)
     API: {
-        BASE_PATH: '/api/v1', // usado para compor a URL completa
-        BASE_FULL: (function(){
-            // garante que não haja '//' duplicado ao juntar
-            const base = CONFIG && CONFIG.API_URL ? CONFIG.API_URL : (window && window.location ? window.location.origin : '');
-            return base.replace(/\/+$/,'') + '/api/v1';
-        })(),
+        BASE_URL: '/api/v1',
         AUTH: {
             LOGIN: '/auth/login',
             REGISTER: '/auth/register',
@@ -187,4 +185,25 @@ const CONFIG = {
 // Exportar configurações
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = CONFIG;
+}
+
+// Antes: uso de localStorage ou condicional com CONFIG.USE_API
+// Depois: sempre usar a API
+function listarMotos() {
+	return window.apiClient.get(CONFIG.API.MOTOS.LIST);
+}
+
+function criarMoto(motoData) {
+	return window.apiClient.post(CONFIG.API.MOTOS.CREATE, motoData);
+}
+
+function atualizarMoto(id, motoData) {
+	// se seu backend espera /motos/update ou /motos/:id ajuste aqui
+	// exemplo usando /motos/update com payload:
+	return window.apiClient.put(CONFIG.API.MOTOS.UPDATE, Object.assign({ id }, motoData));
+}
+
+function deletarMoto(id) {
+	// se backend usa /motos/delete/:id ou /motos/delete com body, ajuste conforme necessário
+	return window.apiClient.del(`${CONFIG.API.MOTOS.DELETE}/${id}`);
 }
