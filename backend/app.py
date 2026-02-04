@@ -21,8 +21,8 @@ app = Flask(__name__)
 # ==========================================
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'vitrine-vendedor-secret-2026')
 
-# Database - Sempre usa SQLite local
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vitrine_vendedor.db'
+# Database - Sempre usa SQLite local na pasta instance
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/vitrine_vendedor.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JSON_AS_ASCII'] = False
 
@@ -59,7 +59,12 @@ db.init_app(app)
 # Importar models e criar tabelas (apenas as tabelas definidas em `models.py`)
 with app.app_context():
     from models import User, Vitrine, Produto
-    db.create_all()
+    try:
+        db.create_all()
+        print("Tabelas criadas com sucesso!")
+    except Exception as e:
+        print(f"Erro ao criar tabelas: {e}")
+        # Continua mesmo se falhar, para não quebrar o deploy
 
 
 # ==========================================
