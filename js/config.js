@@ -12,8 +12,8 @@ const CONFIG = {
     APP_VERSION: '1.0.0',
     APP_URL: IS_PRODUCTION ? 'https://vitrine-do-vendedor.vercel.app' : window.location.origin,
     
-    // API Backend - Agora no mesmo domínio (Vercel Serverless)
-    API_URL: window.location.origin + '/api',
+    // API Backend - Railway em produção
+    API_URL: 'https://vitrine-do-vendedor-production.up.railway.app/api',
     
     // Usar API real ou localStorage
     USE_API: false, // Usando localStorage por enquanto (mais estável)
