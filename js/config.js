@@ -6,6 +6,9 @@
 const IS_PRODUCTION = window.location.hostname !== 'localhost' && 
                        window.location.hostname !== '127.0.0.1';
 
+// URL base da API (variável separada para evitar referência a CONFIG durante inicialização)
+const API_URL = IS_PRODUCTION ? 'https://vitrine-do-vendedor-production.up.railway.app' : window.location.origin;
+
 const CONFIG = {
     // Informações do Sistema
     APP_NAME: 'Vitrine do Vendedor',
@@ -13,7 +16,7 @@ const CONFIG = {
     APP_URL: IS_PRODUCTION ? 'https://vitrine-do-vendedor.vercel.app' : window.location.origin,
     
     // API Backend - Railway em produção
-    API_URL: 'https://vitrine-do-vendedor-production.up.railway.app', // removido '/api' do final
+    API_URL: API_URL, // removido '/api' do final
     
     // Planos e Preços
     PLANOS: {
@@ -143,7 +146,7 @@ const CONFIG = {
         BASE_PATH: '/api/v1', // usado para compor a URL completa
         BASE_FULL: (function(){
             // garante que não haja '//' duplicado ao juntar
-            const base = CONFIG && CONFIG.API_URL ? CONFIG.API_URL : (window && window.location ? window.location.origin : '');
+            const base = (typeof API_URL !== 'undefined' && API_URL) ? API_URL : (window && window.location ? window.location.origin : '');
             return base.replace(/\/+$/,'') + '/api/v1';
         })(),
         AUTH: {
