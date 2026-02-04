@@ -1,10 +1,10 @@
 # ============================================
 # Vitrine do Vendedor - BACKEND (FLASK)
-# Produção - Compatível com Python 3.13
+# Produção - Compatível com Python 3.11
 # ============================================
 
 # Framework
-Flask==3.0.0
+Flask==2.3.3
 Flask-CORS==4.0.0
 Flask-SQLAlchemy==3.1.1
 
@@ -13,13 +13,13 @@ SQLAlchemy==2.0.36
 
 # Authentication
 PyJWT==2.8.0
-Werkzeug==3.0.1
+Werkzeug==2.3.7
 
 # Environment
 python-dotenv==1.0.0
 
 # Production Server
-gunicorn==23.0.0
+gunicorn==21.2.0
 
 # Email (opcional)
 Flask-Mail==0.10.0

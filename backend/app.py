@@ -22,7 +22,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'vitrine-vendedor-secret-2026')
 
 # Database - Sempre usa SQLite local na pasta instance
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/vitrine_vendedor.db'
+import os
+instance_path = os.path.join(os.getcwd(), 'instance')
+if not os.path.exists(instance_path):
+    os.makedirs(instance_path)
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{instance_path}/vitrine_vendedor.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JSON_AS_ASCII'] = False
 
