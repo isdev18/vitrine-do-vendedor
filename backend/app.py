@@ -3,6 +3,8 @@ Vitrine do Vendedor - Backend API (Flask)
 Servidor principal - Produção
 """
 
+print("🚀 Iniciando Vitrine do Vendedor Backend...")
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
@@ -65,10 +67,12 @@ with app.app_context():
     from models import User, Vitrine, Produto
     try:
         db.create_all()
-        print("Tabelas criadas com sucesso!")
+        print("✅ Tabelas criadas com sucesso!")
     except Exception as e:
-        print(f"Erro ao criar tabelas: {e}")
+        print(f"❌ Erro ao criar tabelas: {e}")
         # Continua mesmo se falhar, para não quebrar o deploy
+
+print("✅ Banco de dados inicializado!")
 
 
 # ==========================================
@@ -667,6 +671,8 @@ def server_error(e):
 with app.app_context():
     db.create_all()
     print("✅ Banco de dados inicializado!")
+
+print("🚀 App Flask pronto para iniciar!")
 
 
 if __name__ == '__main__':
