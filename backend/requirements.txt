@@ -6,10 +6,10 @@
 # Framework
 Flask==2.3.3
 Flask-CORS==4.0.0
-Flask-SQLAlchemy==3.1.1
+Flask-SQLAlchemy==2.5.1
 
 # Database - SQLite (nativo, sem dependências extras)
-SQLAlchemy==2.0.36
+SQLAlchemy==1.4.46
 
 # Authentication
 PyJWT==2.8.0
