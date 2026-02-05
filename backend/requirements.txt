@@ -1,6 +1,7 @@
 flask
-gunicorn
 flask-cors
-flask-sqlalchemy
+gunicorn
 python-dotenv
+requests
+sqlalchemy
 PyJWT
