@@ -1,6 +1,6 @@
 """
 Vitrine do Vendedor - Backend API (Flask)
-Servidor principal - Produção (Railway)
+Produção Railway
 """
 
 import os
@@ -8,66 +8,45 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from datetime import datetime
 
-# Carregar variáveis de ambiente
+# Carregar env
 from dotenv import load_dotenv
 load_dotenv()
 
-# Criar app Flask
 app = Flask(__name__)
 
-# ==========================================
-# CONFIGURAÇÕES
-# ==========================================
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'vitrine-vendedor-secret-2026')
-
-# Database - SQLite local (para produção Railway, dados são efêmeros)
-instance_path = os.path.join(os.getcwd(), 'instance')
-os.makedirs(instance_path, exist_ok=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{instance_path}/vitrine_vendedor.db'
+# Configurações
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(os.getcwd(), "instance", "vitrine_vendedor.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JSON_AS_ASCII'] = False
 
-# JWT Config
-JWT_SECRET = os.getenv('JWT_SECRET_KEY', 'jwt-vitrine-vendedor-secret-2026')
+# JWT
+JWT_SECRET = os.getenv('JWT_SECRET_KEY', 'default-jwt')
 JWT_ALGORITHM = 'HS256'
 JWT_EXPIRE_HOURS = 24
 
-# Planos
-PLANS = {
-    'basico': {'name': 'Básico', 'price': 49.90, 'max_products': 10},
-    'profissional': {'name': 'Profissional', 'price': 89.90, 'max_products': 50},
-    'premium': {'name': 'Premium', 'price': 149.90, 'max_products': 999}
-}
-
-# ==========================================
-# CORS - Permitir frontend
-# ==========================================
+# CORS
 FRONTEND_URL = os.getenv('FRONTEND_URL', '*')
-CORS(app, origins=[
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "http://localhost:3000",
-    FRONTEND_URL,
-    "*"
-], supports_credentials=True)
+CORS(app, origins=[FRONTEND_URL, "*"], supports_credentials=True)
 
-# ==========================================
-# DATABASE
-# ==========================================
+# Database
 from extensions import db
 db.init_app(app)
 
-# Inicializar banco (com tratamento de erro para produção)
+# Inicializar banco (robust para produção)
 with app.app_context():
     try:
         from models import User, Vitrine, Produto
         db.create_all()
-        app.logger.info("Banco de dados inicializado com sucesso")
+        app.logger.info("Banco inicializado")
     except Exception as e:
-        app.logger.error(f"Erro ao inicializar banco: {e}")
-        # Não crashar o app em produção
+        app.logger.error(f"Erro banco: {e}")
 
-print("🚀 App Flask pronto para iniciar!")
+# Utilitários
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from datetime import timedelta
+from functools import wraps
 
 
 # ==========================================
