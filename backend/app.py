@@ -1,15 +1,12 @@
 """
 Vitrine do Vendedor - Backend API (Flask)
-Servidor principal - Produção
+Servidor principal - Produção (Railway)
 """
 
-print("🚀 Iniciando Vitrine do Vendedor Backend...")
-
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-
 from datetime import datetime
-import os
 
 # Carregar variáveis de ambiente
 from dotenv import load_dotenv
@@ -23,11 +20,9 @@ app = Flask(__name__)
 # ==========================================
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'vitrine-vendedor-secret-2026')
 
-# Database - Sempre usa SQLite local na pasta instance
-import os
+# Database - SQLite local (para produção Railway, dados são efêmeros)
 instance_path = os.path.join(os.getcwd(), 'instance')
-if not os.path.exists(instance_path):
-    os.makedirs(instance_path)
+os.makedirs(instance_path, exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{instance_path}/vitrine_vendedor.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JSON_AS_ASCII'] = False
@@ -62,17 +57,17 @@ CORS(app, origins=[
 from extensions import db
 db.init_app(app)
 
-# Importar models e criar tabelas (apenas as tabelas definidas em `models.py`)
+# Inicializar banco (com tratamento de erro para produção)
 with app.app_context():
-    from models import User, Vitrine, Produto
     try:
+        from models import User, Vitrine, Produto
         db.create_all()
-        print("✅ Tabelas criadas com sucesso!")
+        app.logger.info("Banco de dados inicializado com sucesso")
     except Exception as e:
-        print(f"❌ Erro ao criar tabelas: {e}")
-        # Continua mesmo se falhar, para não quebrar o deploy
+        app.logger.error(f"Erro ao inicializar banco: {e}")
+        # Não crashar o app em produção
 
-print("✅ Banco de dados inicializado!")
+print("🚀 App Flask pronto para iniciar!")
 
 
 # ==========================================
@@ -676,10 +671,4 @@ print("🚀 App Flask pronto para iniciar!")
 
 
 if __name__ == '__main__':
-    print("=" * 50)
-    print("🏍️  Vitrine do Vendedor - BACKEND API")
-    print("=" * 50)
-    print("📡 Servidor: http://localhost:5000")
-    print("🔗 Status: http://localhost:5000/api/status")
-    print("=" * 50)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
