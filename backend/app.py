@@ -2,7 +2,7 @@ import logging
 import os
 import traceback
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, redirect, request, send_from_directory
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -41,10 +41,23 @@ def is_api_path(path: str) -> bool:
         return False
     normalized = "/" + path.lstrip("/")
     return (
-        normalized in {"/register", "/login"}
+        normalized in {"/register", "/cadastro", "/login"}
         or normalized.startswith("/auth")
         or normalized.startswith("/api")
     )
+
+
+def get_request_data():
+    if request.is_json:
+        return request.get_json(silent=True) or {}
+    return request.form.to_dict() or {}
+
+
+def wants_json_response():
+    if request.is_json:
+        return True
+    accept = (request.headers.get("Accept") or "").lower()
+    return "application/json" in accept or "text/javascript" in accept
 
 
 def no_cache(response):
@@ -76,16 +89,19 @@ def health():
     return jsonify({"status": "ok"}), 200
 
 
-@app.route("/login", methods=["POST", "OPTIONS"])
-@app.route("/auth/login", methods=["POST", "OPTIONS"])
-@app.route("/api/auth/login", methods=["POST", "OPTIONS"])
-@app.route("/api/v1/auth/login", methods=["POST", "OPTIONS"])
+@app.route("/login", methods=["GET", "POST", "OPTIONS"])
+@app.route("/auth/login", methods=["GET", "POST", "OPTIONS"])
+@app.route("/api/auth/login", methods=["GET", "POST", "OPTIONS"])
+@app.route("/api/v1/auth/login", methods=["GET", "POST", "OPTIONS"])
 def login():
+    if request.method == "GET":
+        return send_from_directory(FRONTEND_DIR, "login.html")
+
     if request.method == "OPTIONS":
         return "", 204
 
     try:
-        data = request.get_json(silent=True) or {}
+        data = get_request_data()
         email = (data.get("email") or "").strip()
         senha = data.get("senha") or ""
 
@@ -99,17 +115,15 @@ def login():
             import time
 
             token = base64.b64encode(f"{email}:{time.time()}".encode()).decode()
-            return (
-                jsonify(
-                    {
-                        "success": True,
-                        "message": "Login realizado com sucesso",
-                        "user": resposta["user"],
-                        "token": token,
-                    }
-                ),
-                200,
-            )
+            payload = {
+                "success": True,
+                "message": "Login realizado com sucesso",
+                "user": resposta["user"],
+                "token": token,
+            }
+            if wants_json_response():
+                return jsonify(payload), 200
+            return redirect("/painel.html", code=302)
 
         return (
             jsonify(
@@ -125,18 +139,22 @@ def login():
         return jsonify({"success": False, "message": str(exc), "trace": traceback.format_exc()}), 500
 
 
-@app.route("/register", methods=["POST", "OPTIONS"])
-@app.route("/auth/register", methods=["POST", "OPTIONS"])
-@app.route("/api/register", methods=["POST", "OPTIONS"])
-@app.route("/api/auth/register", methods=["POST", "OPTIONS"])
-@app.route("/api/v1/register", methods=["POST", "OPTIONS"])
-@app.route("/api/v1/auth/register", methods=["POST", "OPTIONS"])
+@app.route("/cadastro", methods=["GET", "POST", "OPTIONS"])
+@app.route("/register", methods=["GET", "POST", "OPTIONS"])
+@app.route("/auth/register", methods=["GET", "POST", "OPTIONS"])
+@app.route("/api/register", methods=["GET", "POST", "OPTIONS"])
+@app.route("/api/auth/register", methods=["GET", "POST", "OPTIONS"])
+@app.route("/api/v1/register", methods=["GET", "POST", "OPTIONS"])
+@app.route("/api/v1/auth/register", methods=["GET", "POST", "OPTIONS"])
 def register():
+    if request.method == "GET":
+        return send_from_directory(FRONTEND_DIR, "cadastro.html")
+
     if request.method == "OPTIONS":
         return "", 204
 
     try:
-        data = request.get_json(silent=True) or {}
+        data = get_request_data()
         nome = (data.get("nome") or "").strip()
         email = (data.get("email") or "").strip().lower()
         senha = data.get("senha") or ""
@@ -157,6 +175,10 @@ def register():
         )
 
         status_code = 201 if resposta.get("status") == "ok" else 400
+        if wants_json_response():
+            return jsonify(resposta), status_code
+        if status_code == 201:
+            return redirect("/login.html?cadastro=ok", code=302)
         return jsonify(resposta), status_code
     except Exception as exc:
         app.logger.exception("Erro no register")
@@ -208,6 +230,6 @@ def serve_frontend(path):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 3000))
+    port = int(os.environ.get("PORT", 5000))
     app.logger.info("Running on port %s", port)
     app.run(host="0.0.0.0", port=port)
