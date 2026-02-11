@@ -34,6 +34,7 @@ class AuthService {
         this.tokenKey = 'vh_auth_token';
         this.userKey = 'vh_current_user';
         this.sessionKey = 'vh_session';
+        this.apiBaseUrl = (typeof CONFIG !== 'undefined' && CONFIG.API_URL) ? CONFIG.API_URL.replace(/\/+$/, '') : '';
     }
 
     // ==========================================
@@ -65,7 +66,7 @@ class AuthService {
         // Enviar para o backend Flask usando safeFetch
         let result;
         try {
-            result = await safeFetch('/register', {
+            result = await safeFetch(`${this.apiBaseUrl}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -92,7 +93,8 @@ class AuthService {
         }
         let result;
         try {
-            result = await safeFetch(CONFIG.API.AUTH.LOGIN || '/auth/login', {
+            const loginPath = CONFIG.API.AUTH.LOGIN || '/auth/login';
+            result = await safeFetch(`${this.apiBaseUrl}${loginPath}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, senha })
