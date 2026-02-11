@@ -1,10 +1,5 @@
 flask
-gunicorn
-psycopg2-binary
 flask-cors
-flask-sqlalchemy
-python-dotenv
-PyJWT
-supabase
-bcrypt
 requests
+gunicorn
+psutil
