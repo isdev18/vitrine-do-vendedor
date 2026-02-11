@@ -40,7 +40,11 @@ def is_api_path(path: str) -> bool:
     if not path:
         return False
     normalized = "/" + path.lstrip("/")
-    return normalized == "/register" or normalized.startswith("/auth") or normalized.startswith("/api")
+    return (
+        normalized in {"/register", "/login"}
+        or normalized.startswith("/auth")
+        or normalized.startswith("/api")
+    )
 
 
 def no_cache(response):
@@ -72,7 +76,10 @@ def health():
     return jsonify({"status": "ok"}), 200
 
 
+@app.route("/login", methods=["POST", "OPTIONS"])
 @app.route("/auth/login", methods=["POST", "OPTIONS"])
+@app.route("/api/auth/login", methods=["POST", "OPTIONS"])
+@app.route("/api/v1/auth/login", methods=["POST", "OPTIONS"])
 def login():
     if request.method == "OPTIONS":
         return "", 204
@@ -119,6 +126,11 @@ def login():
 
 
 @app.route("/register", methods=["POST", "OPTIONS"])
+@app.route("/auth/register", methods=["POST", "OPTIONS"])
+@app.route("/api/register", methods=["POST", "OPTIONS"])
+@app.route("/api/auth/register", methods=["POST", "OPTIONS"])
+@app.route("/api/v1/register", methods=["POST", "OPTIONS"])
+@app.route("/api/v1/auth/register", methods=["POST", "OPTIONS"])
 def register():
     if request.method == "OPTIONS":
         return "", 204

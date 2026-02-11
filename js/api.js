@@ -80,11 +80,38 @@ async function apiPost(acao, dados = {}) {
 // Função de registro padronizada: sempre usa backend Flask
 async function register(dados) {
     try {
-        const result = await safeFetch(CONFIG.API.AUTH.REGISTER || '/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dados)
-        });
+        const apiBaseUrl = (CONFIG && CONFIG.API_URL ? CONFIG.API_URL : window.location.origin).replace(/\/+$/, '');
+        const paths = [
+            CONFIG.API.AUTH.REGISTER || '/register',
+            '/register',
+            '/auth/register',
+            '/api/register',
+            '/api/auth/register',
+            '/api/v1/register',
+            '/api/v1/auth/register'
+        ];
+        let result = null;
+        let lastError = null;
+
+        for (const path of paths) {
+            try {
+                result = await safeFetch(`${apiBaseUrl}${path}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                break;
+            } catch (err) {
+                lastError = err;
+                const message = String(err && err.message ? err.message : '');
+                if (!message.includes('HTTP 404') && !message.includes('HTTP 405')) {
+                    throw err;
+                }
+            }
+        }
+        if (!result && lastError) {
+            throw lastError;
+        }
         if (!result || typeof result !== 'object' || result.status !== 'ok') {
             throw new Error(result && result.msg ? result.msg : 'Erro ao cadastrar');
         }

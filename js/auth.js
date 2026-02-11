@@ -37,82 +37,95 @@ class AuthService {
         this.apiBaseUrl = (typeof CONFIG !== 'undefined' && CONFIG.API_URL) ? CONFIG.API_URL.replace(/\/+$/, '') : '';
     }
 
+    async postWithFallback(paths, payload) {
+        let lastError = null;
+        for (const path of paths) {
+            try {
+                return await safeFetch(`${this.apiBaseUrl}${path}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                lastError = err;
+                const message = String(err && err.message ? err.message : '');
+                if (!message.includes('HTTP 404') && !message.includes('HTTP 405')) {
+                    throw err;
+                }
+            }
+        }
+        throw lastError || new Error('Erro ao conectar com a API');
+    }
+
     // ==========================================
     // REGISTRO
     // ==========================================
 
     async register(email, senha, confirmarSenha) {
-        // Validações
         if (!email || !senha || !confirmarSenha) {
-            throw new Error('Todos os campos são obrigatórios');
+            throw new Error('Todos os campos sao obrigatorios');
         }
 
         if (!this.validateEmail(email)) {
-            throw new Error('Email inválido');
+            throw new Error('Email invalido');
         }
 
         if (senha.length < CONFIG.SEGURANCA.SENHA_MIN_LENGTH) {
-            throw new Error(`A senha deve ter no mínimo ${CONFIG.SEGURANCA.SENHA_MIN_LENGTH} caracteres`);
+            throw new Error(`A senha deve ter no minimo ${CONFIG.SEGURANCA.SENHA_MIN_LENGTH} caracteres`);
         }
 
         if (CONFIG.SEGURANCA.SENHA_REQUER_NUMERO && !/\d/.test(senha)) {
-            throw new Error('A senha deve conter pelo menos um número');
+            throw new Error('A senha deve conter pelo menos um numero');
         }
 
         if (senha !== confirmarSenha) {
-            throw new Error('As senhas não conferem');
+            throw new Error('As senhas nao conferem');
         }
 
-        // Enviar para o backend Flask usando safeFetch
         let result;
         try {
-            result = await safeFetch(`${this.apiBaseUrl}/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nome: email.split('@')[0], // ou peça o nome no formulário
-                    email,
-                    senha,
-                    telefone: '' // ou peça o telefone no formulário
-                })
-            });
+            result = await this.postWithFallback(['/register', '/auth/register', '/api/register', '/api/auth/register', '/api/v1/register', '/api/v1/auth/register'], { nome: email.split('@')[0], email, senha, telefone: '' });
         } catch (err) {
             throw new Error(err.message || 'Erro ao cadastrar');
         }
-        if (!result || !result.status || result.status !== 'ok') throw new Error(result && result.msg ? result.msg : 'Erro ao cadastrar');
+
+        if (!result || !result.status || result.status !== 'ok') {
+            throw new Error(result && result.msg ? result.msg : 'Erro ao cadastrar');
+        }
         return result;
     }
 
-    // ==========================================
     // LOGIN
     // ==========================================
 
     async login(email, senha, lembrar = false) {
         if (!email || !senha) {
-            throw new Error('Email e senha são obrigatórios');
+            throw new Error('Email e senha sao obrigatorios');
         }
+
         let result;
         try {
             const loginPath = CONFIG.API.AUTH.LOGIN || '/auth/login';
-            result = await safeFetch(`${this.apiBaseUrl}${loginPath}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, senha })
-            });
+            const loginPaths = [loginPath, '/auth/login', '/login', '/api/auth/login', '/api/v1/auth/login'];
+            result = await this.postWithFallback(loginPaths, { email, senha });
         } catch (err) {
             throw new Error(err.message || 'Erro ao fazer login');
         }
+
         if (!result || !result.success) {
             throw new Error(result && result.message ? result.message : 'Email ou senha incorretos');
         }
-        // Salvar sessão/token conforme resposta do backend
+
         const token = result.token;
         const user = result.user;
-        if (!token || !user) throw new Error('Resposta inválida do backend');
+        if (!token || !user) {
+            throw new Error('Resposta invalida do backend');
+        }
+
         const session = {
             token,
             user_id: user.id,
-            user, // Salva o usuário completo na sessão
+            user,
             created_at: new Date().toISOString(),
             expires_at: new Date(Date.now() + CONFIG.SEGURANCA.SESSION_TIMEOUT).toISOString(),
             remember: lembrar
@@ -121,7 +134,6 @@ class AuthService {
         return result;
     }
 
-    // ==========================================
     // LOGOUT
     // ==========================================
 
@@ -382,3 +394,4 @@ setInterval(() => {
         auth.refreshSession();
     }
 }, 300000);
+
