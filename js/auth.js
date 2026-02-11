@@ -34,14 +34,30 @@ class AuthService {
         this.tokenKey = 'vh_auth_token';
         this.userKey = 'vh_current_user';
         this.sessionKey = 'vh_session';
-        this.apiBaseUrl = (typeof CONFIG !== 'undefined' && CONFIG.API_URL) ? CONFIG.API_URL.replace(/\/+$/, '') : '';
+        this.apiBaseUrl = this.resolveApiBaseUrl();
+    }
+
+    resolveApiBaseUrl() {
+        if (typeof CONFIG !== 'undefined' && CONFIG.API_URL) {
+            return String(CONFIG.API_URL).replace(/\/+$/, '');
+        }
+        return window.location.origin.replace(/\/+$/, '');
+    }
+
+    buildApiUrl(path) {
+        if (!path) return this.apiBaseUrl;
+        if (/^https?:\/\//i.test(path)) return path;
+        const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+        return `${this.apiBaseUrl}${normalizedPath}`;
     }
 
     async postWithFallback(paths, payload) {
         let lastError = null;
         for (const path of paths) {
+            const endpoint = this.buildApiUrl(path);
             try {
-                return await safeFetch(`${this.apiBaseUrl}${path}`, {
+                console.log('[AuthService] POST', endpoint);
+                return await safeFetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
