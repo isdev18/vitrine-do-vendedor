@@ -137,7 +137,11 @@ def add_header(response):
 # =========================
 # START
 # =========================
+import os
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 3000))
+    print("🚀 PORTA RAILWAY:", port)
     app.run(host="0.0.0.0", port=port)
+
 
