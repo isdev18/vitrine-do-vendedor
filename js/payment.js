@@ -35,43 +35,25 @@ class PaymentService {
             });
 
             if (paymentResult.status === 'approved') {
-                // Criar assinatura no banco
-                const subscription = db.createSubscription(userId, planoId);
-
-                // Registrar pagamento
-                const pagamento = db.createPagamento(userId, {
-                    subscription_id: subscription.id,
+                // Criar assinatura via API/backend
+                const apiResult = await apiPost('criar_assinatura', {
+                    user_id: userId,
+                    plano_id: planoId,
                     valor: plano.preco,
                     metodo: paymentData.method || 'cartao',
                     gateway_id: paymentResult.id,
                     gateway_response: paymentResult
                 });
-
-                // Atualizar status do pagamento
-                db.updatePagamento(pagamento.id, { status: 'aprovado' });
-
-                // Enviar email de confirmação
-                db.queueEmail(CONFIG.EMAIL.TEMPLATES.CONFIRMACAO_PAGAMENTO, userId, {
-                    plano: plano.nome,
-                    valor: plano.preco
-                });
-
+                if (!apiResult || !apiResult.success) {
+                    throw new Error(apiResult && apiResult.message ? apiResult.message : 'Erro ao registrar assinatura');
+                }
                 return {
                     success: true,
                     message: 'Assinatura ativada com sucesso!',
-                    subscription,
+                    subscription: apiResult.subscription,
                     payment: paymentResult
                 };
             } else {
-                // Registrar pagamento recusado
-                db.createPagamento(userId, {
-                    valor: plano.preco,
-                    metodo: paymentData.method || 'cartao',
-                    gateway_id: paymentResult.id,
-                    gateway_response: paymentResult,
-                    status: 'recusado'
-                });
-
                 throw new Error(paymentResult.error || 'Pagamento não aprovado');
             }
         } catch (error) {
@@ -151,39 +133,30 @@ class PaymentService {
     // ==========================================
 
     checkSubscriptionStatus(userId) {
-        const subscription = db.getSubscriptionByUserId(userId);
-        
-        if (!subscription) {
-            return { status: 'none', message: 'Nenhuma assinatura ativa' };
-        }
-
-        const now = new Date();
-        const periodEnd = new Date(subscription.current_period_end);
-        const trialEnd = subscription.trial_ends_at ? new Date(subscription.trial_ends_at) : null;
-
-        // Verificar trial
-        if (subscription.status === 'trial' && trialEnd && now > trialEnd) {
-            db.updateSubscription(subscription.id, { status: 'inadimplente' });
-            db.updateUser(userId, { status: 'inadimplente' });
-            return { status: 'trial_expired', message: 'Período de teste expirado' };
-        }
-
-        // Verificar período pago
-        if (now > periodEnd && subscription.status === 'ativo') {
-            db.updateSubscription(subscription.id, { status: 'inadimplente' });
-            db.updateUser(userId, { status: 'inadimplente' });
-            
-            // Enviar email de atraso
-            db.queueEmail(CONFIG.EMAIL.TEMPLATES.PAGAMENTO_ATRASADO, userId);
-            
-            return { status: 'overdue', message: 'Pagamento em atraso' };
-        }
-
-        return {
-            status: subscription.status,
-            message: this.getStatusMessage(subscription.status),
-            subscription
-        };
+        // Buscar assinatura via API/backend
+        return apiPost('buscar_assinatura', { user_id: userId })
+            .then(result => {
+                if (!result || !result.success || !result.subscription) {
+                    return { status: 'none', message: 'Nenhuma assinatura ativa' };
+                }
+                const subscription = result.subscription;
+                const now = new Date();
+                const periodEnd = new Date(subscription.current_period_end);
+                const trialEnd = subscription.trial_ends_at ? new Date(subscription.trial_ends_at) : null;
+                // Verificar trial
+                if (subscription.status === 'trial' && trialEnd && now > trialEnd) {
+                    return { status: 'trial_expired', message: 'Período de teste expirado' };
+                }
+                // Verificar período pago
+                if (now > periodEnd && subscription.status === 'ativo') {
+                    return { status: 'overdue', message: 'Pagamento em atraso' };
+                }
+                return {
+                    status: subscription.status,
+                    message: this.getStatusMessage(subscription.status),
+                    subscription
+                };
+            });
     }
 
     getStatusMessage(status) {

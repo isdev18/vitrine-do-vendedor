@@ -1,6 +1,33 @@
-// ============================================
-// Vitrine do Vendedor - SISTEMA DE AUTENTICAÇÃO
-// ============================================
+
+// Garante que safeFetch está disponível globalmente
+if (typeof safeFetch === 'undefined') {
+    window.safeFetch = async function(url, options = {}) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Erro HTTP ${response.status}: ${text}`);
+            }
+            const contentType = response.headers.get('content-type');
+            const text = await response.text();
+            let data = null;
+            if (text && contentType && contentType.includes('application/json')) {
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error('Falha ao fazer parse do JSON:', e, text);
+                    throw new Error('Resposta não é um JSON válido');
+                }
+            } else if (text) {
+                data = text;
+            }
+            return data;
+        } catch (error) {
+            console.error('Erro ao buscar dados da API:', error);
+            throw error;
+        }
+    };
+}
 
 class AuthService {
     constructor() {
@@ -35,28 +62,24 @@ class AuthService {
             throw new Error('As senhas não conferem');
         }
 
+        // Enviar para o backend Flask usando safeFetch
+        let result;
         try {
-            // Criar usuário no banco
-            const user = db.createUser({
-                email: email.toLowerCase().trim(),
-                senha: senha
+            result = await safeFetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nome: email.split('@')[0], // ou peça o nome no formulário
+                    email,
+                    senha,
+                    telefone: '' // ou peça o telefone no formulário
+                })
             });
-
-            // Enviar email de boas-vindas
-            db.queueEmail(CONFIG.EMAIL.TEMPLATES.BOAS_VINDAS, user.id);
-
-            // Log
-            db.addLog('register_success', user.id, { email: user.email });
-
-            return {
-                success: true,
-                message: 'Conta criada com sucesso!',
-                user: this.sanitizeUser(user)
-            };
-        } catch (error) {
-            db.addLog('register_failed', null, { email, error: error.message });
-            throw error;
+        } catch (err) {
+            throw new Error(err.message || 'Erro ao cadastrar');
         }
+        if (!result || !result.status || result.status !== 'ok') throw new Error(result && result.msg ? result.msg : 'Erro ao cadastrar');
+        return result;
     }
 
     // ==========================================
@@ -67,48 +90,33 @@ class AuthService {
         if (!email || !senha) {
             throw new Error('Email e senha são obrigatórios');
         }
-
-        const user = db.getUserByEmail(email.toLowerCase().trim());
-
-        if (!user) {
-            db.addLog('login_failed', null, { email, reason: 'user_not_found' });
-            throw new Error('Email ou senha incorretos');
+        let result;
+        try {
+            result = await safeFetch(CONFIG.API.AUTH.LOGIN || '/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            });
+        } catch (err) {
+            throw new Error(err.message || 'Erro ao fazer login');
         }
-
-        // Verificar se usuário está bloqueado
-        if (user.status === 'bloqueado') {
-            throw new Error('Sua conta está bloqueada. Entre em contato com o suporte.');
+        if (!result || !result.success) {
+            throw new Error(result && result.message ? result.message : 'Email ou senha incorretos');
         }
-
-        // Verificar senha
-        if (!db.verifyPassword(senha, user.senha_hash)) {
-            db.addLog('login_failed', user.id, { reason: 'wrong_password' });
-            throw new Error('Email ou senha incorretos');
-        }
-
-        // Criar sessão
-        const token = this.generateToken(user);
+        // Salvar sessão/token conforme resposta do backend
+        const token = result.token;
+        const user = result.user;
+        if (!token || !user) throw new Error('Resposta inválida do backend');
         const session = {
             token,
             user_id: user.id,
+            user, // Salva o usuário completo na sessão
             created_at: new Date().toISOString(),
             expires_at: new Date(Date.now() + CONFIG.SEGURANCA.SESSION_TIMEOUT).toISOString(),
             remember: lembrar
         };
-
-        // Salvar sessão
         this.saveSession(session, lembrar);
-
-        // Log
-        db.addLog('login_success', user.id);
-
-        return {
-            success: true,
-            message: 'Login realizado com sucesso!',
-            user: this.sanitizeUser(user),
-            token,
-            redirectTo: user.role === 'admin' ? 'admin.html' : 'painel.html'
-        };
+        return result;
     }
 
     // ==========================================
@@ -150,18 +158,14 @@ class AuthService {
 
     getCurrentUser() {
         if (!this.isAuthenticated()) return null;
-
         const session = this.getSession();
-        const user = db.getUserById(session.user_id);
-
-        return user ? this.sanitizeUser(user) : null;
+        return session.user ? this.sanitizeUser(session.user) : null;
     }
 
     getFullCurrentUser() {
         if (!this.isAuthenticated()) return null;
-
         const session = this.getSession();
-        return db.getUserById(session.user_id);
+        return session.user || null;
     }
 
     isAdmin() {
@@ -345,7 +349,8 @@ class AuthService {
         const storage = remember ? localStorage : sessionStorage;
         storage.setItem(this.sessionKey, JSON.stringify(session));
         storage.setItem(this.tokenKey, session.token);
-        storage.setItem(this.userKey, JSON.stringify(db.getUserById(session.user_id)));
+        // Salva o usuário retornado do backend (com role)
+        storage.setItem(this.userKey, JSON.stringify(session.user));
     }
 
     getSession() {

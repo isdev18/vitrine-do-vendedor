@@ -14,27 +14,26 @@ let motoImagensTemp = [];
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar autenticação
     if (!auth.requireAuth('login.html')) return;
-    
-    // Verificar se tem assinatura
+
+    // Sempre pegue o usuário logado pela auth
     currentUser = auth.getFullCurrentUser();
-    
-    if (currentUser.role !== 'admin') {
-        const subscription = db.getSubscriptionByUserId(currentUser.id);
-        if (!subscription) {
-            window.location.href = 'planos.html';
-            return;
-        }
-        
-        // Verificar status da assinatura
-        const status = payment.checkSubscriptionStatus(currentUser.id);
-        if (status.status === 'bloqueado') {
-            alert('Sua assinatura está bloqueada. Regularize o pagamento para continuar.');
-            window.location.href = 'planos.html';
-            return;
-        }
+
+    // Se não encontrar usuário, força logout
+    if (!currentUser || !currentUser.id) {
+        alert('Usuário não encontrado. Faça login novamente.');
+        auth.logout();
+        return;
     }
-    
-    // Carregar dados
+
+    // Buscar assinatura local
+    const assinatura = db.getSubscriptionByUserId(currentUser.id);
+    if (!assinatura) {
+        document.getElementById('planoInfo').innerHTML = '<span class="plano-badge">Nenhum plano</span> <span class="plano-dias">-</span>';
+    } else {
+        updatePlanoInfo(assinatura);
+    }
+
+    // Carregar dados do painel normalmente
     loadUserData();
     loadVitrine();
     loadProdutos();
@@ -48,22 +47,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function loadUserData() {
     currentUser = auth.getFullCurrentUser();
-    
+
+    if (!currentUser || !currentUser.id) {
+        alert('Usuário não encontrado. Faça login novamente.');
+        auth.logout();
+        return;
+    }
+
     // Atualizar header
-    document.getElementById('userName').textContent = currentUser.nome || currentUser.email.split('@')[0];
-    document.getElementById('userAvatar').textContent = (currentUser.nome || currentUser.email)[0].toUpperCase();
-    document.getElementById('welcomeName').textContent = currentUser.nome || currentUser.email.split('@')[0];
-    
+    document.getElementById('userName').textContent = currentUser.nome ? currentUser.nome : (currentUser.email ? currentUser.email.split('@')[0] : 'Usuário');
+    document.getElementById('userAvatar').textContent = (currentUser.nome ? currentUser.nome[0] : (currentUser.email ? currentUser.email[0] : 'U')).toUpperCase();
+    document.getElementById('welcomeName').textContent = currentUser.nome ? currentUser.nome : (currentUser.email ? currentUser.email.split('@')[0] : 'Usuário');
+
     // Atualizar info do plano
     const subscription = db.getSubscriptionByUserId(currentUser.id);
     if (subscription) {
         updatePlanoInfo(subscription);
+    } else {
+        document.getElementById('planoInfo').innerHTML = '<span class="plano-badge">Nenhum plano</span> <span class="plano-dias">-</span>';
     }
 }
 
 function loadVitrine() {
     currentVitrine = db.getVitrineByUserId(currentUser.id);
-    
+
     if (!currentVitrine) {
         currentVitrine = db.createVitrine(currentUser.id);
     }
@@ -180,23 +187,29 @@ function updateStats() {
 
 function updatePlanoInfo(subscription) {
     const planoInfo = document.getElementById('planoInfo');
-    const badge = planoInfo.querySelector('.plano-badge');
-    const dias = planoInfo.querySelector('.plano-dias');
-    
-    badge.textContent = subscription.plano_nome;
-    badge.className = 'plano-badge ' + subscription.status;
-    
+    let badgeText = subscription.plano_nome || 'Plano';
+    let badgeClass = 'plano-badge ' + (subscription.status || '');
+    let diasText = '';
     if (subscription.status === 'trial') {
-        const trialEnd = new Date(subscription.trial_ends_at);
+        const trialEnd = subscription.trial_ends_at ? new Date(subscription.trial_ends_at) : null;
         const today = new Date();
-        const daysLeft = Math.ceil((trialEnd - today) / (1000 * 60 * 60 * 24));
-        dias.textContent = `${Math.max(0, daysLeft)} dias de teste`;
+        const daysLeft = trialEnd ? Math.ceil((trialEnd - today) / (1000 * 60 * 60 * 24)) : '-';
+        diasText = `${Math.max(0, daysLeft)} dias de teste`;
+    } else if (subscription.status === 'ativo') {
+        const periodEnd = subscription.current_period_end ? new Date(subscription.current_period_end) : null;
+        const today = new Date();
+        const daysLeft = periodEnd ? Math.ceil((periodEnd - today) / (1000 * 60 * 60 * 24)) : '-';
+        diasText = `Renova em ${Math.max(0, daysLeft)} dias`;
+    } else if (subscription.status === 'inadimplente') {
+        diasText = 'Pagamento pendente';
+    } else if (subscription.status === 'bloqueado') {
+        diasText = 'Assinatura bloqueada';
+    } else if (subscription.status === 'cancelado') {
+        diasText = 'Assinatura cancelada';
     } else {
-        const periodEnd = new Date(subscription.current_period_end);
-        const today = new Date();
-        const daysLeft = Math.ceil((periodEnd - today) / (1000 * 60 * 60 * 24));
-        dias.textContent = `Renova em ${Math.max(0, daysLeft)} dias`;
+        diasText = '-';
     }
+    planoInfo.innerHTML = `<span class="${badgeClass}">${badgeText}</span> <span class="plano-dias">${diasText}</span>`;
 }
 
 // ==========================================

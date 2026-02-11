@@ -151,7 +151,7 @@ const CONFIG = {
         })(),
         AUTH: {
             LOGIN: '/auth/login',
-            REGISTER: '/auth/register',
+            REGISTER: '/register',
             LOGOUT: '/auth/logout',
             REFRESH: '/auth/refresh',
             FORGOT_PASSWORD: '/auth/forgot-password',

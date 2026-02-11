@@ -629,52 +629,51 @@
             btnLoading.style.display = 'inline-flex';
             submitBtn.disabled = true;
             
-            try {
-                const result = await auth.login(email, senha, lembrar);
-                
-                const user = auth.getFullCurrentUser();
-                
-                // Verificar se é admin
-                if (user.role === 'admin') {
-                    window.location.href = 'admin.html';
-                    return;
-                }
-                
-                // Verificar se tem pagamento aprovado pendente
-                const pagamentoAprovado = sessionStorage.getItem('pagamentoAprovado');
-                if (pagamentoAprovado) {
-                    const dados = JSON.parse(pagamentoAprovado);
-                    sessionStorage.removeItem('pagamentoAprovado');
-                    
-                    // Criar assinatura com os dados do pagamento
-                    await payment.createSubscription(user.id, dados.plano, {
-                        method: dados.metodo
-                    });
-                    
-                    alert('🎉 Assinatura ativada com sucesso! Você tem 7 dias grátis para testar.');
+            let tentativasLogin = 0;
+            const maxTentativasLogin = 5;
+            const tentarLogin = async () => {
+                try {
+                    const result = await auth.login(email, senha, lembrar);
+                    const user = auth.getFullCurrentUser();
+
+                    // Verificar se é admin
+                    if (user.role === 'admin') {
+                        window.location.href = 'admin.html';
+                        return;
+                    }
+
+                    // Verificar se tem pagamento aprovado pendente
+                    const pagamentoAprovado = sessionStorage.getItem('pagamentoAprovado');
+                    if (pagamentoAprovado) {
+                        const dados = JSON.parse(pagamentoAprovado);
+                        sessionStorage.removeItem('pagamentoAprovado');
+                        // Criar assinatura com os dados do pagamento
+                        await payment.createSubscription(user.id, dados.plano, {
+                            method: dados.metodo
+                        });
+                        alert('🎉 Assinatura ativada com sucesso! Você tem 7 dias grátis para testar.');
+                    }
+
+                    // Sempre ir para o painel após login
                     window.location.href = 'painel.html';
                     return;
+
+                } catch (error) {
+                    tentativasLogin++;
+                    if (error.message.includes('não existe') && tentativasLogin < maxTentativasLogin) {
+                        loginError.querySelector('.alert-text').textContent = 'Usuário não encontrado. Aguarde alguns segundos e tente novamente...';
+                        loginError.style.display = 'flex';
+                        setTimeout(tentarLogin, 2000);
+                    } else {
+                        loginError.querySelector('.alert-text').textContent = error.message;
+                        loginError.style.display = 'flex';
+                        btnText.style.display = 'inline';
+                        btnLoading.style.display = 'none';
+                        submitBtn.disabled = false;
+                    }
                 }
-                
-                // Verificar se tem assinatura ativa
-                const subscription = db.getSubscriptionByUserId(user.id);
-                
-                if (!subscription) {
-                    // Não tem assinatura, ir para planos
-                    window.location.href = 'planos.html';
-                } else {
-                    // Tem assinatura, ir para painel
-                    window.location.href = 'painel.html';
-                }
-                
-            } catch (error) {
-                loginError.querySelector('.alert-text').textContent = error.message;
-                loginError.style.display = 'flex';
-            } finally {
-                btnText.style.display = 'inline';
-                btnLoading.style.display = 'none';
-                submitBtn.disabled = false;
-            }
+            };
+            tentarLogin();
         });
         
         function togglePassword(inputId) {
